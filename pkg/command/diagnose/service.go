@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	. "github.com/cdlliuy/knative-diagnose/pkg/utils"
+	. "github.com/knative-sandbox/kn-plugin-diag/pkg/utils"
 	"github.com/spf13/cobra"
 
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"

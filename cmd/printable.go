@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	. "github.com/cdlliuy/knative-diagnose/pkg/utils"
+	. "github.com/knative-sandbox/kn-plugin-diag/pkg/utils"
 )
 
 type Resource struct {

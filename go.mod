@@ -1,4 +1,4 @@
-module github.com/cdlliuy/knative-diagnose
+module github.com/knative-sandbox/kn-plugin-diag
 
 go 1.13
 

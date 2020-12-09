@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	. "github.com/cdlliuy/knative-diagnose/pkg/utils"
+	. "github.com/knative-sandbox/kn-plugin-diag/pkg/utils"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"

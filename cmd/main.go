@@ -3,14 +3,14 @@ package main
 import (
 	"fmt"
 	"os"
+
 	// "strings"
 	// "time"
 
+	"github.com/knative-sandbox/kn-plugin-diag/pkg/command/diagnose"
+	"github.com/knative-sandbox/kn-plugin-diag/pkg/utils"
 	"github.com/spf13/cobra"
-	"github.com/cdlliuy/knative-diagnose/pkg/command/diagnose"
-	 "github.com/cdlliuy/knative-diagnose/pkg/utils"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
-
 )
 
 
