@@ -1,17 +1,20 @@
-module knative-sandbox/kn-plugin-diag
+module knative.dev/kn-plugin-diag
 
 go 1.13
 
 require (
+	github.com/fatih/color v1.9.0
 	github.com/imdario/mergo v0.3.10 // indirect
 	github.com/spf13/cobra v0.0.6
-	github.com/wayneashleyberry/terminal-dimensions v1.0.0 // indirect
+	github.com/wayneashleyberry/terminal-dimensions v1.0.0
 	golang.org/x/time v0.0.0-20200630173020-3af7569d3a1e // indirect
-	k8s.io/api v0.18.6 // indirect
-	k8s.io/apimachinery v0.18.6 // indirect
+	k8s.io/api v0.18.6
+	k8s.io/apimachinery v0.18.6
 	k8s.io/client-go v11.0.1-0.20190805182717-6502b5e7b1b5+incompatible
 	k8s.io/utils v0.0.0-20200731180307-f00132d28269 // indirect
-	knative.dev/serving v0.16.0 // indirect
+	knative.dev/caching v0.0.0-20200630172829-a78409990d76
+	knative.dev/networking v0.0.0-20200630191330-5080f859c17d
+	knative.dev/serving v0.16.0
 )
 
 // Pinned to kubernetes-1.15.4

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"knative-sandbox/kn-plugin-diag/pkg/command/diagnose"
+	"knative.dev/kn-plugin-diag/pkg/command/diagnose"
 
 	"github.com/spf13/cobra"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
