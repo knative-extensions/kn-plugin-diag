@@ -1,4 +1,4 @@
-module knative-sandbox/kn-plugin-diag
+module knative.dev/kn-plugin-diag
 
 go 1.13
 
