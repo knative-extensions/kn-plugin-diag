@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"strings"
 
-	. "knative.dev/kn-plugin-diag/pkg/utils"
 	"github.com/spf13/cobra"
+	. "knative.dev/kn-plugin-diag/pkg/utils"
 
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
 	nv1alpha1 "knative.dev/networking/pkg/apis/networking/v1alpha1"
