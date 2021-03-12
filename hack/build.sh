@@ -16,6 +16,8 @@
 
 set -o pipefail
 
+source $(dirname $0)/global_vars.sh
+
 # =================================================
 
 # Store for later
@@ -85,9 +87,9 @@ run() {
   codegen
   go_build
   go_test
-
-  echo "────────────────────────────────────────────"
-  ./$PLUGIN version
+# TODO: enable once there's `version` cmd
+#  echo "────────────────────────────────────────────"
+#  ./$PLUGIN version
 }
 
 
@@ -143,7 +145,7 @@ go_test() {
 
   echo "🧪 ${X}Test"
   set +e
-  go test -v ./pkg/... ./internal/... >$test_output 2>&1
+  go test -v ./pkg/... >$test_output 2>&1
   local err=$?
   if [ $err -ne 0 ]; then
     echo "🔥 ${red}Failure${reset}"
