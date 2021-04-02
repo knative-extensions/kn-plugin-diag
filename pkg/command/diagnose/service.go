@@ -78,7 +78,7 @@ knative-diagnose service <ksvc-name> -ns <namespace>\n`)
 func dumpToTables(f *Fetcher, verbose string) error {
 
 	if f.KSVC == nil {
-		return fmt.Errorf("Can't fetch any KSVC CR for the target service")
+		return fmt.Errorf("Can't fetch any KSVC CR for the target knative service")
 	}
 
 	var table Table
@@ -90,8 +90,8 @@ func dumpToTables(f *Fetcher, verbose string) error {
 		//table.SetSeperator(false)
 		err = createKeyInfoTable(table, f)
 	case "conditions":
-		table = NewTable(os.Stdout, []string{"Resource Type", "Name", "Status.Conditions"})
-		table.SetSeperator(false)
+		table = NewTable(os.Stdout, []string{"Resource Type", "Name", "Created At", "Status.Condition"})
+		table.SetSeperator(true)
 		err = createConditionsTable(table, f)
 	default:
 		table = NewTable(os.Stdout, []string{"Resource Type", "Name", "Status", "Created At", "LastTransistion At"})
@@ -122,7 +122,7 @@ func createKeyInfoTable(table Table, f *Fetcher) error {
 	table.AddMuitpleRows(ksvcResource.DumpResource())
 
 	if f.Configuration == nil {
-		return fmt.Errorf("Can't fetch any Configuration CR for the target service")
+		return fmt.Errorf("Can't fetch any Configuration CR for the target knative service")
 	}
 	configResource := NewPrintableResource(1, "configuration", f.Configuration.ObjectMeta.Name, strconv.FormatBool(f.Configuration.IsReady()), WithVerboseType(verbose))
 	if f.Configuration.Status.LatestCreatedRevisionName != "" {
@@ -134,13 +134,13 @@ func createKeyInfoTable(table Table, f *Fetcher) error {
 	table.AddMuitpleRows(configResource.DumpResource())
 
 	if f.Revision == nil {
-		return fmt.Errorf("Can't fetch any Revision CR for the target service")
+		return fmt.Errorf("Can't fetch any Revision CR for the target knative service")
 	}
 	revisionResource := NewPrintableResource(2, "revision", f.Revision.ObjectMeta.Name, strconv.FormatBool(f.Revision.IsReady()), WithVerboseType(verbose))
 	table.AddMuitpleRows(revisionResource.DumpResource())
 
 	if f.Deployment == nil {
-		return fmt.Errorf("Can't fetch any Deployment for the target service")
+		return fmt.Errorf("Can't fetch any Deployment for the target knative service")
 	}
 	deploymentResource := NewPrintableResource(3, "deployment", f.Deployment.ObjectMeta.Name, "--",
 		WithVerboseType(verbose))
@@ -163,14 +163,14 @@ func createKeyInfoTable(table Table, f *Fetcher) error {
 	table.AddMuitpleRows(deploymentResource.DumpResource())
 
 	if f.Images == nil {
-		return fmt.Errorf("Can't fetch any ImageCache CR for the target service")
+		return fmt.Errorf("Can't fetch any ImageCache CR for the target knative service")
 	}
 	imgCacheResource := NewPrintableResource(3, "image", f.Images.ObjectMeta.Name, "--",
 		WithVerboseType(verbose))
 	table.AddMuitpleRows(imgCacheResource.DumpResource())
 
 	if f.KPA == nil {
-		return fmt.Errorf("Can't fetch any ImageCach CR for the target service")
+		return fmt.Errorf("Can't fetch any ImageCach CR for the target knative service")
 	}
 	kpaResource := NewPrintableResource(3, "podautoscaler", f.KPA.ObjectMeta.Name, strconv.FormatBool(f.KPA.IsReady()),
 		WithVerboseType(verbose))
@@ -183,7 +183,7 @@ func createKeyInfoTable(table Table, f *Fetcher) error {
 	table.AddMuitpleRows(kpaResource.DumpResource())
 
 	if f.Metrics == nil {
-		return fmt.Errorf("Can't fetch any ImageCach CR for the target service")
+		return fmt.Errorf("Can't fetch any ImageCach CR for the target knative service")
 	}
 	metricResource := NewPrintableResource(4, "metrics", f.Metrics.ObjectMeta.Name, strconv.FormatBool(f.Metrics.IsReady()),
 		WithVerboseType(verbose))
@@ -193,7 +193,7 @@ func createKeyInfoTable(table Table, f *Fetcher) error {
 	table.AddMuitpleRows(metricResource.DumpResource())
 
 	if f.SKS == nil {
-		return fmt.Errorf("Can't fetch any SKS CR for the target service")
+		return fmt.Errorf("Can't fetch any SKS CR for the target knative service")
 	}
 	sksResource := NewPrintableResource(4, "sks", f.SKS.ObjectMeta.Name, fmt.Sprintf("%v", f.SKS.Spec.Mode),
 		WithVerboseType(verbose))
@@ -217,7 +217,7 @@ func createKeyInfoTable(table Table, f *Fetcher) error {
 	table.AddMuitpleRows(publicEpResource.DumpResource())
 
 	if f.Routes == nil {
-		return fmt.Errorf("Can't fetch any Routes CR for the target service")
+		return fmt.Errorf("Can't fetch any Routes CR for the target knative service")
 	}
 	routesResource := NewPrintableResource(1, "routes", f.Routes.ObjectMeta.Name, strconv.FormatBool(f.Routes.IsReady()),
 		WithVerboseType(verbose))
@@ -229,14 +229,14 @@ func createKeyInfoTable(table Table, f *Fetcher) error {
 	table.AddMuitpleRows(routesResource.DumpResource())
 
 	if f.RoutesSVC == nil {
-		return fmt.Errorf("Can't fetch any external public service  CR for the target service")
+		return fmt.Errorf("Can't fetch any external public service  CR for the target knative service")
 	}
 	externalsvcResource := NewPrintableResource(2, "svc", f.RoutesSVC.ObjectMeta.Name, "--",
 		WithVerboseType(verbose))
 	table.AddMuitpleRows(externalsvcResource.DumpResource())
 
 	if f.King == nil {
-		return fmt.Errorf("Can't fetch any Ingress CR for the target service")
+		return fmt.Errorf("Can't fetch any Ingress CR for the target knative service")
 	}
 	ingressResource := NewPrintableResource(2, "ingress", f.King.ObjectMeta.Name, strconv.FormatBool(f.King.IsReady()),
 		WithVerboseType(verbose))
@@ -251,13 +251,14 @@ func createConditionsTable(table Table, f *Fetcher) error {
 	ksvcResource := NewPrintableResource(0, "ksvc", f.KSVC.ObjectMeta.Name, strconv.FormatBool(f.KSVC.IsReady()),
 		WithCreatedAt(f.KSVC.CreationTimestamp.Rfc3339Copy().String()),
 		WithVerboseType(verbose))
+
 	for _, cond := range f.KSVC.Status.Conditions {
 		ksvcResource.AppendConditions([]string{cond.LastTransitionTime.Inner.Rfc3339Copy().String(), string(cond.Type), string(cond.Status), cond.Reason, cond.Message})
 	}
 	table.AddMuitpleRows(ksvcResource.DumpResource())
 
 	if f.Configuration == nil {
-		return fmt.Errorf("Can't fetch any Configuration CR for the target service")
+		return fmt.Errorf("Can't fetch any Configuration CR for the target knative service")
 	}
 	configResource := NewPrintableResource(1, "configuration", f.Configuration.ObjectMeta.Name, strconv.FormatBool(f.Configuration.IsReady()),
 		WithCreatedAt(f.Configuration.CreationTimestamp.Rfc3339Copy().String()),
@@ -268,7 +269,7 @@ func createConditionsTable(table Table, f *Fetcher) error {
 	table.AddMuitpleRows(configResource.DumpResource())
 
 	if f.Revision == nil {
-		return fmt.Errorf("Can't fetch any Revision CR for the target service")
+		return fmt.Errorf("Can't fetch any Revision CR for the target knative service")
 	}
 	revisionResource := NewPrintableResource(2, "revision", f.Revision.ObjectMeta.Name, strconv.FormatBool(f.Revision.IsReady()),
 		WithCreatedAt(f.Revision.CreationTimestamp.Rfc3339Copy().String()),
@@ -279,7 +280,7 @@ func createConditionsTable(table Table, f *Fetcher) error {
 	table.AddMuitpleRows(revisionResource.DumpResource())
 
 	if f.Deployment == nil {
-		return fmt.Errorf("Can't fetch any Deployment for the target service")
+		return fmt.Errorf("Can't fetch any Deployment CR for the target knative service")
 	}
 	deploymentResource := NewPrintableResource(3, "deployment", f.Deployment.ObjectMeta.Name, "--",
 		WithCreatedAt(f.Deployment.CreationTimestamp.Rfc3339Copy().String()),
@@ -289,8 +290,35 @@ func createConditionsTable(table Table, f *Fetcher) error {
 	}
 	table.AddMuitpleRows(deploymentResource.DumpResource())
 
+	if f.Replicaset != nil {
+		replicasetResource := NewPrintableResource(4, "replicaset", f.Replicaset.ObjectMeta.Name, "--",
+			WithCreatedAt(f.Replicaset.CreationTimestamp.Rfc3339Copy().String()),
+			WithVerboseType(verbose))
+		replicasetResource.AppendConditions([]string{"replicas:" + strconv.Itoa((int)(f.Replicaset.Status.Replicas))})
+		replicasetResource.AppendConditions([]string{"availableReplicas:" + strconv.Itoa((int)(f.Replicaset.Status.AvailableReplicas))})
+		replicasetResource.AppendConditions([]string{"readyReplicas:" + strconv.Itoa((int)(f.Replicaset.Status.ReadyReplicas))})
+		table.AddMuitpleRows(replicasetResource.DumpResource())
+
+		if len(f.Pods) != 0 {
+			for _, pod := range f.Pods {
+				podResource := NewPrintableResource(5, "pod", pod.ObjectMeta.Name, "--",
+					WithCreatedAt(pod.CreationTimestamp.Rfc3339Copy().String()),
+					WithVerboseType(verbose))
+				for _, cond := range pod.Status.Conditions {
+					podResource.AppendConditions([]string{cond.LastTransitionTime.Rfc3339Copy().String(), string(cond.Type), string(cond.Status), cond.Reason, cond.Message})
+				}
+				table.AddMuitpleRows(podResource.DumpResource())
+			}
+		}
+		if (int)(f.Replicaset.Status.Replicas) > len(f.Pods) {
+			podResource := NewPrintableResource(5, "pod", "Omitted "+strconv.Itoa((int)(f.Replicaset.Status.Replicas)-len(f.Pods))+" more pod resources..", "",
+				WithVerboseType(verbose))
+			table.AddMuitpleRows(podResource.DumpResource())
+		}
+	}
+
 	if f.Images == nil {
-		return fmt.Errorf("Can't fetch any ImageCache CR for the target service")
+		return fmt.Errorf("Can't fetch any ImageCache CR for the target knative service")
 	}
 	imgCacheResource := NewPrintableResource(3, "image", f.Images.ObjectMeta.Name, "--",
 		WithCreatedAt(f.Images.CreationTimestamp.Rfc3339Copy().String()),
@@ -298,7 +326,7 @@ func createConditionsTable(table Table, f *Fetcher) error {
 	table.AddMuitpleRows(imgCacheResource.DumpResource())
 
 	if f.KPA == nil {
-		return fmt.Errorf("Can't fetch any ImageCach CR for the target service")
+		return fmt.Errorf("Can't fetch any PodAutoscaler CR for the target knative service")
 	}
 	kpaResource := NewPrintableResource(3, "podautoscaler", f.KPA.ObjectMeta.Name, strconv.FormatBool(f.KPA.IsReady()),
 		WithCreatedAt(f.KPA.CreationTimestamp.Rfc3339Copy().String()),
@@ -309,7 +337,7 @@ func createConditionsTable(table Table, f *Fetcher) error {
 	table.AddMuitpleRows(kpaResource.DumpResource())
 
 	if f.Metrics == nil {
-		return fmt.Errorf("Can't fetch any ImageCach CR for the target service")
+		return fmt.Errorf("Can't fetch any Metrics CR for the target knative service")
 	}
 	metricResource := NewPrintableResource(4, "metrics", f.Metrics.ObjectMeta.Name, strconv.FormatBool(f.Metrics.IsReady()),
 		WithCreatedAt(f.Metrics.CreationTimestamp.Rfc3339Copy().String()),
@@ -320,7 +348,7 @@ func createConditionsTable(table Table, f *Fetcher) error {
 	table.AddMuitpleRows(metricResource.DumpResource())
 
 	if f.SKS == nil {
-		return fmt.Errorf("Can't fetch any SKS CR for the target service")
+		return fmt.Errorf("Can't fetch any SKS CR for the target knative service")
 	}
 	sksResource := NewPrintableResource(4, "sks", f.SKS.ObjectMeta.Name, fmt.Sprintf("%v", f.SKS.Spec.Mode),
 		WithCreatedAt(f.SKS.CreationTimestamp.Rfc3339Copy().String()),
@@ -351,7 +379,7 @@ func createConditionsTable(table Table, f *Fetcher) error {
 	table.AddMuitpleRows(publicEpResource.DumpResource())
 
 	if f.Routes == nil {
-		return fmt.Errorf("Can't fetch any Routes CR for the target service")
+		return fmt.Errorf("Can't fetch any Routes CR for the target knative service")
 	}
 	routesResource := NewPrintableResource(1, "routes", f.Routes.ObjectMeta.Name, strconv.FormatBool(f.Routes.IsReady()),
 		WithCreatedAt(f.Routes.CreationTimestamp.Rfc3339Copy().String()),
@@ -362,7 +390,7 @@ func createConditionsTable(table Table, f *Fetcher) error {
 	table.AddMuitpleRows(routesResource.DumpResource())
 
 	if f.RoutesSVC == nil {
-		return fmt.Errorf("Can't fetch any external public service  CR for the target service")
+		return fmt.Errorf("Can't fetch any external public service  CR for the target knative service")
 	}
 	externalsvcResource := NewPrintableResource(2, "svc", f.RoutesSVC.ObjectMeta.Name, "--",
 		WithCreatedAt(f.RoutesSVC.CreationTimestamp.Rfc3339Copy().String()),
@@ -370,7 +398,7 @@ func createConditionsTable(table Table, f *Fetcher) error {
 	table.AddMuitpleRows(externalsvcResource.DumpResource())
 
 	if f.King == nil {
-		return fmt.Errorf("Can't fetch any Ingress CR for the target service")
+		return fmt.Errorf("Can't fetch any Ingress CR for the target knative service")
 	}
 	ingressResource := NewPrintableResource(2, "ingress", f.King.ObjectMeta.Name, strconv.FormatBool(f.King.IsReady()),
 		WithCreatedAt(f.King.CreationTimestamp.Rfc3339Copy().String()),
@@ -392,7 +420,7 @@ func createTinyTable(table Table, f *Fetcher) error {
 	table.AddMuitpleRows(ksvcResource.DumpResource())
 
 	if f.Configuration == nil {
-		return fmt.Errorf("Can't fetch any Configuration CR for the target service")
+		return fmt.Errorf("Can't fetch any Configuration CR for the target knative service")
 	}
 	configResource := NewPrintableResource(1, "configuration", f.Configuration.ObjectMeta.Name, strconv.FormatBool(f.Configuration.IsReady()),
 		WithCreatedAt(f.Configuration.CreationTimestamp.Rfc3339Copy().String()),
@@ -400,7 +428,7 @@ func createTinyTable(table Table, f *Fetcher) error {
 	table.AddMuitpleRows(configResource.DumpResource())
 
 	if f.Revision == nil {
-		return fmt.Errorf("Can't fetch any Revision CR for the target service")
+		return fmt.Errorf("Can't fetch any Revision CR for the target knative service")
 	}
 	revisionResource := NewPrintableResource(2, "revision", f.Revision.ObjectMeta.Name, strconv.FormatBool(f.Revision.IsReady()),
 		WithCreatedAt(f.Revision.CreationTimestamp.Rfc3339Copy().String()),
@@ -408,21 +436,42 @@ func createTinyTable(table Table, f *Fetcher) error {
 	table.AddMuitpleRows(revisionResource.DumpResource())
 
 	if f.Deployment == nil {
-		return fmt.Errorf("Can't fetch any Deployment for the target service")
+		return fmt.Errorf("Can't fetch any Deployment for the target knative service")
 	}
 	deploymentResource := NewPrintableResource(3, "deployment", f.Deployment.ObjectMeta.Name, "--",
 		WithCreatedAt(f.Deployment.CreationTimestamp.Rfc3339Copy().String()))
 	table.AddMuitpleRows(deploymentResource.DumpResource())
 
+	if f.Replicaset != nil {
+		replicasetResource := NewPrintableResource(4, "replicaset", f.Replicaset.ObjectMeta.Name, "--",
+			WithCreatedAt(f.Replicaset.CreationTimestamp.Rfc3339Copy().String()),
+			WithVerboseType(verbose))
+		table.AddMuitpleRows(replicasetResource.DumpResource())
+
+		if len(f.Pods) != 0 {
+			for _, pod := range f.Pods {
+				podResource := NewPrintableResource(5, "pod", pod.ObjectMeta.Name, "--",
+					WithCreatedAt(pod.CreationTimestamp.Rfc3339Copy().String()),
+					WithVerboseType(verbose))
+				table.AddMuitpleRows(podResource.DumpResource())
+			}
+		}
+		if (int)(f.Replicaset.Status.Replicas) > len(f.Pods) {
+			podResource := NewPrintableResource(5, "pod", "Omitted "+strconv.Itoa((int)(f.Replicaset.Status.Replicas)-len(f.Pods))+" more pod resources..", "",
+				WithVerboseType(verbose))
+			table.AddMuitpleRows(podResource.DumpResource())
+		}
+	}
+
 	if f.Images == nil {
-		return fmt.Errorf("Can't fetch any ImageCache CR for the target service")
+		return fmt.Errorf("Can't fetch any ImageCache CR for the target knative service")
 	}
 	imgCacheResource := NewPrintableResource(3, "image", f.Images.ObjectMeta.Name, "--",
 		WithCreatedAt(f.Images.CreationTimestamp.Rfc3339Copy().String()))
 	table.AddMuitpleRows(imgCacheResource.DumpResource())
 
 	if f.KPA == nil {
-		return fmt.Errorf("Can't fetch any ImageCach CR for the target service")
+		return fmt.Errorf("Can't fetch any ImageCach CR for the target knative service")
 	}
 	kpaResource := NewPrintableResource(3, "podautoscaler", f.KPA.ObjectMeta.Name, strconv.FormatBool(f.KPA.IsReady()),
 		WithCreatedAt(f.KPA.CreationTimestamp.Rfc3339Copy().String()),
@@ -430,7 +479,7 @@ func createTinyTable(table Table, f *Fetcher) error {
 	table.AddMuitpleRows(kpaResource.DumpResource())
 
 	if f.Metrics == nil {
-		return fmt.Errorf("Can't fetch any ImageCach CR for the target service")
+		return fmt.Errorf("Can't fetch any ImageCach CR for the target knative service")
 	}
 	metricResource := NewPrintableResource(4, "metrics", f.Metrics.ObjectMeta.Name, strconv.FormatBool(f.Metrics.IsReady()),
 		WithCreatedAt(f.Metrics.CreationTimestamp.Rfc3339Copy().String()),
@@ -438,7 +487,7 @@ func createTinyTable(table Table, f *Fetcher) error {
 	table.AddMuitpleRows(metricResource.DumpResource())
 
 	if f.SKS == nil {
-		return fmt.Errorf("Can't fetch any SKS CR for the target service")
+		return fmt.Errorf("Can't fetch any SKS CR for the target knative service")
 	}
 	sksResource := NewPrintableResource(4, "sks", f.SKS.ObjectMeta.Name, fmt.Sprintf("%v", f.SKS.Spec.Mode),
 		WithCreatedAt(f.SKS.CreationTimestamp.Rfc3339Copy().String()),
@@ -462,7 +511,7 @@ func createTinyTable(table Table, f *Fetcher) error {
 	table.AddMuitpleRows(publicEpResource.DumpResource())
 
 	if f.Routes == nil {
-		return fmt.Errorf("Can't fetch any Routes CR for the target service")
+		return fmt.Errorf("Can't fetch any Routes CR for the target knative service")
 	}
 	routesResource := NewPrintableResource(1, "routes", f.Routes.ObjectMeta.Name, strconv.FormatBool(f.Routes.IsReady()),
 		WithCreatedAt(f.Routes.CreationTimestamp.Rfc3339Copy().String()),
@@ -470,14 +519,14 @@ func createTinyTable(table Table, f *Fetcher) error {
 	table.AddMuitpleRows(routesResource.DumpResource())
 
 	if f.RoutesSVC == nil {
-		return fmt.Errorf("Can't fetch any external public service  CR for the target service")
+		return fmt.Errorf("Can't fetch any external public service  CR for the target knative service")
 	}
 	externalsvcResource := NewPrintableResource(2, "svc", f.RoutesSVC.ObjectMeta.Name, "--",
 		WithCreatedAt(f.RoutesSVC.CreationTimestamp.Rfc3339Copy().String()))
 	table.AddMuitpleRows(externalsvcResource.DumpResource())
 
 	if f.King == nil {
-		return fmt.Errorf("Can't fetch any Ingress CR for the target service")
+		return fmt.Errorf("Can't fetch any Ingress CR for the target knative service")
 	}
 	ingressResource := NewPrintableResource(2, "ingress", f.King.ObjectMeta.Name, strconv.FormatBool(f.King.IsReady()),
 		WithCreatedAt(f.King.CreationTimestamp.Rfc3339Copy().String()),
