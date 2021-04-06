@@ -229,7 +229,7 @@ func createKeyInfoTable(table Table, f *Fetcher) error {
 	table.AddMuitpleRows(routesResource.DumpResource())
 
 	if f.RoutesSVC == nil {
-		return fmt.Errorf("Can't fetch any external public service  CR for the target knative service")
+		return fmt.Errorf("Can't fetch any external public service CR for the target knative service")
 	}
 	externalsvcResource := NewPrintableResource(2, "svc", f.RoutesSVC.ObjectMeta.Name, "--",
 		WithVerboseType(verbose))
@@ -390,7 +390,7 @@ func createConditionsTable(table Table, f *Fetcher) error {
 	table.AddMuitpleRows(routesResource.DumpResource())
 
 	if f.RoutesSVC == nil {
-		return fmt.Errorf("Can't fetch any external public service  CR for the target knative service")
+		return fmt.Errorf("Can't fetch any external public service CR for the target knative service")
 	}
 	externalsvcResource := NewPrintableResource(2, "svc", f.RoutesSVC.ObjectMeta.Name, "--",
 		WithCreatedAt(f.RoutesSVC.CreationTimestamp.Rfc3339Copy().String()),
@@ -519,7 +519,7 @@ func createTinyTable(table Table, f *Fetcher) error {
 	table.AddMuitpleRows(routesResource.DumpResource())
 
 	if f.RoutesSVC == nil {
-		return fmt.Errorf("Can't fetch any external public service  CR for the target knative service")
+		return fmt.Errorf("Can't fetch any external public service CR for the target knative service")
 	}
 	externalsvcResource := NewPrintableResource(2, "svc", f.RoutesSVC.ObjectMeta.Name, "--",
 		WithCreatedAt(f.RoutesSVC.CreationTimestamp.Rfc3339Copy().String()))
