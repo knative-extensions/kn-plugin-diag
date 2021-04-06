@@ -163,14 +163,14 @@ func createKeyInfoTable(table Table, f *Fetcher) error {
 	table.AddMuitpleRows(deploymentResource.DumpResource())
 
 	if f.Images == nil {
-		return fmt.Errorf("Can't fetch any ImageCache CR for the target knative service")
+		return fmt.Errorf("Can't fetch any ImageCachee CR for the target knative service")
 	}
 	imgCacheResource := NewPrintableResource(3, "image", f.Images.ObjectMeta.Name, "--",
 		WithVerboseType(verbose))
 	table.AddMuitpleRows(imgCacheResource.DumpResource())
 
 	if f.KPA == nil {
-		return fmt.Errorf("Can't fetch any ImageCach CR for the target knative service")
+		return fmt.Errorf("Can't fetch any ImageCache CR for the target knative service")
 	}
 	kpaResource := NewPrintableResource(3, "podautoscaler", f.KPA.ObjectMeta.Name, strconv.FormatBool(f.KPA.IsReady()),
 		WithVerboseType(verbose))
@@ -183,7 +183,7 @@ func createKeyInfoTable(table Table, f *Fetcher) error {
 	table.AddMuitpleRows(kpaResource.DumpResource())
 
 	if f.Metrics == nil {
-		return fmt.Errorf("Can't fetch any ImageCach CR for the target knative service")
+		return fmt.Errorf("Can't fetch any ImageCache CR for the target knative service")
 	}
 	metricResource := NewPrintableResource(4, "metrics", f.Metrics.ObjectMeta.Name, strconv.FormatBool(f.Metrics.IsReady()),
 		WithVerboseType(verbose))
@@ -318,7 +318,7 @@ func createConditionsTable(table Table, f *Fetcher) error {
 	}
 
 	if f.Images == nil {
-		return fmt.Errorf("Can't fetch any ImageCache CR for the target knative service")
+		return fmt.Errorf("Can't fetch any ImageCachee CR for the target knative service")
 	}
 	imgCacheResource := NewPrintableResource(3, "image", f.Images.ObjectMeta.Name, "--",
 		WithCreatedAt(f.Images.CreationTimestamp.Rfc3339Copy().String()),
@@ -464,14 +464,14 @@ func createTinyTable(table Table, f *Fetcher) error {
 	}
 
 	if f.Images == nil {
-		return fmt.Errorf("Can't fetch any ImageCache CR for the target knative service")
+		return fmt.Errorf("Can't fetch any ImageCachee CR for the target knative service")
 	}
 	imgCacheResource := NewPrintableResource(3, "image", f.Images.ObjectMeta.Name, "--",
 		WithCreatedAt(f.Images.CreationTimestamp.Rfc3339Copy().String()))
 	table.AddMuitpleRows(imgCacheResource.DumpResource())
 
 	if f.KPA == nil {
-		return fmt.Errorf("Can't fetch any ImageCach CR for the target knative service")
+		return fmt.Errorf("Can't fetch any ImageCache CR for the target knative service")
 	}
 	kpaResource := NewPrintableResource(3, "podautoscaler", f.KPA.ObjectMeta.Name, strconv.FormatBool(f.KPA.IsReady()),
 		WithCreatedAt(f.KPA.CreationTimestamp.Rfc3339Copy().String()),
@@ -479,7 +479,7 @@ func createTinyTable(table Table, f *Fetcher) error {
 	table.AddMuitpleRows(kpaResource.DumpResource())
 
 	if f.Metrics == nil {
-		return fmt.Errorf("Can't fetch any ImageCach CR for the target knative service")
+		return fmt.Errorf("Can't fetch any ImageCache CR for the target knative service")
 	}
 	metricResource := NewPrintableResource(4, "metrics", f.Metrics.ObjectMeta.Name, strconv.FormatBool(f.Metrics.IsReady()),
 		WithCreatedAt(f.Metrics.CreationTimestamp.Rfc3339Copy().String()),
