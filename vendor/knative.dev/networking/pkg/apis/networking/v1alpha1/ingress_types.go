@@ -25,7 +25,7 @@ import (
 )
 
 // +genclient
-// +genreconciler:krshapedlogic=true
+// +genreconciler:class=networking.knative.dev/ingress.class,krshapedlogic=true
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // Ingress is a collection of rules that allow inbound connections to reach the endpoints defined
@@ -37,17 +37,17 @@ import (
 type Ingress struct {
 	metav1.TypeMeta `json:",inline"`
 	// Standard object's metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata
+	// More info: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	// Spec is the desired state of the Ingress.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status
+	// More info: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
 	// +optional
 	Spec IngressSpec `json:"spec,omitempty"`
 
 	// Status is the current state of the Ingress.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status
+	// More info: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
 	// +optional
 	Status IngressStatus `json:"status,omitempty"`
 }
@@ -71,7 +71,7 @@ var (
 type IngressList struct {
 	metav1.TypeMeta `json:",inline"`
 	// Standard object metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata
+	// More info: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
 	metav1.ListMeta `json:"metadata,omitempty"`
 
@@ -88,17 +88,6 @@ type IngressList struct {
 // - Timeout & Retry can be configured.
 // - Headers can be appended.
 type IngressSpec struct {
-	// DeprecatedGeneration was used prior in Kubernetes versions <1.11
-	// when metadata.generation was not being incremented by the api server
-	//
-	// This property will be dropped in future Knative releases and should
-	// not be used - use metadata.generation
-	//
-	// Tracking issue: https://github.com/knative/serving/issues/643
-	//
-	// +optional
-	DeprecatedGeneration int64 `json:"generation,omitempty"`
-
 	// TLS configuration. Currently Ingress only supports a single TLS
 	// port: 443. If multiple members of this list specify different hosts, they
 	// will be multiplexed on the same port according to the hostname specified
@@ -111,9 +100,28 @@ type IngressSpec struct {
 	// +optional
 	Rules []IngressRule `json:"rules,omitempty"`
 
-	// Visibility setting.
-	Visibility IngressVisibility `json:"visibility,omitempty"`
+	// HTTPOption is the option of HTTP. It has the following two values:
+	// `HTTPOptionEnabled`, `HTTPOptionRedirected`
+	HTTPOption HTTPOption `json:"httpOption,omitempty"`
+
+	// DeprecatedVisibility was used for the fallback when spec.rules.visibility
+	// isn't set.
+	//
+	// Now spec.rules.visibility is not optional and so we make this field deprecated.
+	//
+	// +optional
+	DeprecatedVisibility IngressVisibility `json:"visibility,omitempty"`
 }
+
+type HTTPOption string
+
+const (
+	// The knative ingress will be able to serve HTTP connections.
+	HTTPOptionEnabled HTTPOption = "Enabled"
+	// The knative will return redirection HTTP status for the clients,
+	// asking the clients to redirect their requests to HTTPS.
+	HTTPOptionRedirected HTTPOption = "Redirected"
+)
 
 // IngressVisibility describes whether the Ingress should be exposed to
 // public gateways or not.
@@ -176,7 +184,6 @@ type IngressRule struct {
 
 	// Visibility signifies whether this rule should `ClusterLocal`. If it's not
 	// specified then it defaults to `ExternalIP`.
-	// +optional
 	Visibility IngressVisibility `json:"visibility,omitempty"`
 
 	// HTTP represents a rule to apply against incoming requests. If the
@@ -192,7 +199,7 @@ type IngressRule struct {
 type HTTPIngressRuleValue struct {
 	// A collection of paths that map requests to backends.
 	//
-	// If they are multiple matching paths, the first match takes precendent.
+	// If they are multiple matching paths, the first match takes precedence.
 	Paths []HTTPIngressPath `json:"paths"`
 
 	// TODO: Consider adding fields for ingress-type specific global
@@ -202,23 +209,18 @@ type HTTPIngressRuleValue struct {
 // HTTPIngressPath associates a path regex with a backend. Incoming URLs matching
 // the path are forwarded to the backend.
 type HTTPIngressPath struct {
-	// Path is an extended POSIX regex as defined by IEEE Std 1003.1,
-	// (i.e this follows the egrep/unix syntax, not the perl syntax)
-	// matched against the path of an incoming request. Currently it can
-	// contain characters disallowed from the conventional "path"
-	// part of a URL as defined by RFC 3986. Paths must begin with
+	// Path represents a literal prefix to which this rule should apply.
+	// Currently it can contain characters disallowed from the conventional
+	// "path" part of a URL as defined by RFC 3986. Paths must begin with
 	// a '/'. If unspecified, the path defaults to a catch all sending
 	// traffic to the backend.
 	// +optional
 	Path string `json:"path,omitempty"`
 
-	// RewriteHost rewrites the incoming request's host header. The request will
-	// then be re-evaluated based on the new host header.
+	// RewriteHost rewrites the incoming request's host header.
 	//
 	// This field is currently experimental and not supported by all Ingress
 	// implementations.
-	//
-	// If RewriteHost is specified, Splits must not be.
 	RewriteHost string `json:"rewriteHost,omitempty"`
 
 	// Headers defines header matching rules which is a map from a header name
@@ -231,8 +233,6 @@ type HTTPIngressPath struct {
 
 	// Splits defines the referenced service endpoints to which the traffic
 	// will be forwarded to.
-	//
-	// If Splits are specified, RewriteHost must not be.
 	Splits []IngressBackendSplit `json:"splits"`
 
 	// AppendHeaders allow specifying additional HTTP headers to add
@@ -242,17 +242,17 @@ type HTTPIngressPath struct {
 	// +optional
 	AppendHeaders map[string]string `json:"appendHeaders,omitempty"`
 
-	// Timeout for HTTP requests.
+	// DeprecatedTimeout is DEPRECATED.
+	// Timeout is not used anymore. See https://github.com/knative/networking/issues/91
 	//
 	// NOTE: This differs from K8s Ingress which doesn't allow setting timeouts.
 	// +optional
-	Timeout *metav1.Duration `json:"timeout,omitempty"`
+	DeprecatedTimeout *metav1.Duration `json:"timeout,omitempty"`
 
-	// Retry policy for HTTP requests.
-	//
-	// NOTE: This differs from K8s Ingress which doesn't allow retry settings.
+	// DeprecatedRetries is DEPRECATED.
+	// Retry in Kingress is not used anymore. See https://github.com/knative/serving/issues/6549
 	// +optional
-	Retries *HTTPRetry `json:"retries,omitempty"`
+	DeprecatedRetries *HTTPRetry `json:"retries,omitempty"`
 }
 
 // IngressBackendSplit describes all endpoints for a given service and port.
@@ -288,7 +288,7 @@ type IngressBackend struct {
 	ServicePort intstr.IntOrString `json:"servicePort"`
 }
 
-// HTTPRetry describes the retry policy to use when a HTTP request fails.
+// HTTPRetry is DEPRECATED. Retry is not used in KIngress.
 type HTTPRetry struct {
 	// Number of retries for a given request.
 	Attempts int `json:"attempts"`
@@ -301,10 +301,10 @@ type HTTPRetry struct {
 type IngressStatus struct {
 	duckv1.Status `json:",inline"`
 
-	// LoadBalancer contains the current status of the load-balancer.
-	// This is to be superseded by the combination of `PublicLoadBalancer` and `PrivateLoadBalancer`
+	// DeprecatedLoadBalancer contains the current status of the load-balancer.
+	// DEPRECATED: Use `PublicLoadBalancer` and `PrivateLoadBalancer` instead.
 	// +optional
-	LoadBalancer *LoadBalancerStatus `json:"loadBalancer,omitempty"`
+	DeprecatedLoadBalancer *LoadBalancerStatus `json:"loadBalancer,omitempty"`
 
 	// PublicLoadBalancer contains the current status of the load-balancer.
 	// +optional
@@ -366,8 +366,8 @@ const (
 )
 
 // GetStatus retrieves the status of the Ingress. Implements the KRShaped interface.
-func (t *Ingress) GetStatus() *duckv1.Status {
-	return &t.Status.Status
+func (i *Ingress) GetStatus() *duckv1.Status {
+	return &i.Status.Status
 }
 
 // HeaderMatch represents a matching value of Headers in HTTPIngressPath.

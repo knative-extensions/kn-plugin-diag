@@ -28,10 +28,10 @@ func (r *Realm) Validate(ctx context.Context) *apis.FieldError {
 }
 
 // Validate inspects and validates RealmSpec object.
-func (spec *RealmSpec) Validate(ctx context.Context) *apis.FieldError {
+func (rs *RealmSpec) Validate(ctx context.Context) *apis.FieldError {
 	var all *apis.FieldError
-	if spec.External == "" && spec.Cluster == "" {
-		all = all.Also(apis.ErrMissingOneOf("external", "cluster"))
+	if rs.External == "" && rs.Internal == "" {
+		all = all.Also(apis.ErrMissingOneOf("external", "internal"))
 	}
 	return all
 }
