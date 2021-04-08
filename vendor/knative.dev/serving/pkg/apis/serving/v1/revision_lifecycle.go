@@ -1,5 +1,5 @@
 /*
-Copyright 2019 The Knative Authors.
+Copyright 2019 The Knative Authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	"knative.dev/pkg/apis"
-	av1alpha1 "knative.dev/serving/pkg/apis/autoscaling/v1alpha1"
+	autoscalingv1alpha1 "knative.dev/serving/pkg/apis/autoscaling/v1alpha1"
 	"knative.dev/serving/pkg/apis/config"
 	"knative.dev/serving/pkg/apis/serving"
 )
@@ -33,6 +33,10 @@ const (
 	// ReasonContainerMissing defines the reason for marking container healthiness status
 	// as false if the a container image for the revision is missing.
 	ReasonContainerMissing = "ContainerMissing"
+
+	// ReasonResolvingDigests defines the reason for marking container healthiness status
+	// as unknown if the digests for the container images are being resolved.
+	ReasonResolvingDigests = "ResolvingDigests"
 
 	// ReasonDeploying defines the reason for marking revision availability status as
 	// unknown if the revision is still deploying.
@@ -119,12 +123,16 @@ func (rs *RevisionStatus) MarkContainerHealthyTrue() {
 
 // MarkContainerHealthyFalse marks ContainerHealthy status on revision as False
 func (rs *RevisionStatus) MarkContainerHealthyFalse(reason, message string) {
-	revisionCondSet.Manage(rs).MarkFalse(RevisionConditionContainerHealthy, reason, message)
+	// We escape here, because errors sometimes contain `%` and that makes the error message
+	// quite poor.
+	revisionCondSet.Manage(rs).MarkFalse(RevisionConditionContainerHealthy, reason, "%s", message)
 }
 
 // MarkContainerHealthyUnknown marks ContainerHealthy status on revision as Unknown
 func (rs *RevisionStatus) MarkContainerHealthyUnknown(reason, message string) {
-	revisionCondSet.Manage(rs).MarkUnknown(RevisionConditionContainerHealthy, reason, message)
+	// We escape here, because errors sometimes contain `%` and that makes the error message
+	// quite poor.
+	revisionCondSet.Manage(rs).MarkUnknown(RevisionConditionContainerHealthy, reason, "%s", message)
 }
 
 // MarkResourcesAvailableTrue marks ResourcesAvailable status on revision as True
@@ -160,27 +168,55 @@ func (rs *RevisionStatus) PropagateDeploymentStatus(original *appsv1.DeploymentS
 }
 
 // PropagateAutoscalerStatus propagates autoscaler's status to the revision's status.
-func (rs *RevisionStatus) PropagateAutoscalerStatus(ps *av1alpha1.PodAutoscalerStatus) {
-	// Propagate the service name from the PA.
-	rs.ServiceName = ps.ServiceName
-
+func (rs *RevisionStatus) PropagateAutoscalerStatus(ps *autoscalingv1alpha1.PodAutoscalerStatus) {
 	// Reflect the PA status in our own.
-	cond := ps.GetCondition(av1alpha1.PodAutoscalerConditionReady)
+	cond := ps.GetCondition(autoscalingv1alpha1.PodAutoscalerConditionReady)
 	if cond == nil {
 		rs.MarkActiveUnknown("Deploying", "")
 		return
+	}
+
+	// Don't mark the resources available, if deployment status already determined
+	// it isn't so.
+	resUnavailable := rs.GetCondition(RevisionConditionResourcesAvailable).IsFalse()
+	if ps.IsScaleTargetInitialized() && !resUnavailable {
+		// Precondition for PA being initialized is SKS being active and
+		// that implies that |service.endpoints| > 0.
+		rs.MarkResourcesAvailableTrue()
+		rs.MarkContainerHealthyTrue()
 	}
 
 	switch cond.Status {
 	case corev1.ConditionUnknown:
 		rs.MarkActiveUnknown(cond.Reason, cond.Message)
 	case corev1.ConditionFalse:
+		// Here we have 2 things coming together at the same time:
+		// 1. The ready is False, meaning the revision is scaled to 0
+		// 2. Initial scale was never achieved, which means we failed to progress
+		//    towards initial scale during the progress deadline period and scaled to 0
+		//		failing to activate.
+		// So mark the revision as failed at that point.
+		// See #8922 for details. When we try to scale to 0, we force the Deployment's
+		// Progress status to become `true`, since successful scale down means
+		// progress has been achieved.
+		// There's the possibility of the revision reconciler reconciling PA before
+		// the ServiceName is populated, and therefore even though we will mark
+		// ScaleTargetInitialized down the road, we would have marked resources
+		// unavailable here, and have no way of recovering later.
+		// If the ResourcesAvailable is already false, don't override the message.
+		if !ps.IsScaleTargetInitialized() && !resUnavailable && ps.ServiceName != "" {
+			rs.MarkResourcesAvailableFalse(ReasonProgressDeadlineExceeded,
+				"Initial scale was never achieved")
+		}
 		rs.MarkActiveFalse(cond.Reason, cond.Message)
 	case corev1.ConditionTrue:
 		rs.MarkActiveTrue()
 
 		// Precondition for PA being active is SKS being active and
-		// that entices that |service.endpoints| > 0.
+		// that implies that |service.endpoints| > 0.
+		//
+		// Note: This is needed for backwards compatibility as we're adding the new
+		// ScaleTargetInitialized condition to gate readiness.
 		rs.MarkResourcesAvailableTrue()
 		rs.MarkContainerHealthyTrue()
 	}

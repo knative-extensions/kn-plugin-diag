@@ -1,9 +1,12 @@
 /*
 Copyright 2021 The Knative Authors
+
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
+
     http://www.apache.org/licenses/LICENSE-2.0
+
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,6 +17,7 @@ limitations under the License.
 package utils
 
 import (
+	"context"
 	"fmt"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -90,92 +94,92 @@ func (f *Fetcher) GetKSVCResources() error {
 		fmt.Printf("failed to create knative networking client%s\n", err)
 	}
 
-	ksvc, err := servingClient.Services(f.ksvcNSName).Get(f.ksvcName, metav1.GetOptions{})
+	ksvc, err := servingClient.Services(f.ksvcNSName).Get(context.Background(), f.ksvcName, metav1.GetOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to get Knative Service under namespace %s !  Error: %v", f.ksvcNSName, err)
 	}
 	f.KSVC = ksvc
 
-	cfg, err := servingClient.Configurations(f.ksvcNSName).Get(f.ksvcName, metav1.GetOptions{})
+	cfg, err := servingClient.Configurations(f.ksvcNSName).Get(context.Background(), f.ksvcName, metav1.GetOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to get Configuration for Knative Service %s under namespace %s ! Error: %v", f.ksvcName, f.ksvcNSName, err)
 	}
 	f.Configuration = cfg
 	revisionName := cfg.Status.LatestCreatedRevisionName
 
-	revision, err := servingClient.Revisions(f.ksvcNSName).Get(revisionName, metav1.GetOptions{})
+	revision, err := servingClient.Revisions(f.ksvcNSName).Get(context.Background(), revisionName, metav1.GetOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to get Knative Revision for Knative Service %s under namespace %s! Error: %v", f.ksvcName, f.ksvcNSName, err)
 	}
 	f.Revision = revision
 
-	deployment, err := k8sClient.AppsV1().Deployments(f.ksvcNSName).Get(revisionName+"-deployment", metav1.GetOptions{})
+	deployment, err := k8sClient.AppsV1().Deployments(f.ksvcNSName).Get(context.Background(), revisionName+"-deployment", metav1.GetOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to get K8S deployment for Knative Service %s / Revision %s under namespace %s! Error: %v", f.ksvcName, revisionName, f.ksvcNSName, err)
 	}
 	f.Deployment = deployment
 
-	image, err := cachingClient.Images(f.ksvcNSName).Get(revisionName+"-cache-user-container", metav1.GetOptions{})
+	image, err := cachingClient.Images(f.ksvcNSName).Get(context.Background(), revisionName+"-cache-user-container", metav1.GetOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to get Knative image caching resources for Knative Service %s / Revision %s under namespace %s! Error: %v", f.ksvcName, revisionName, f.ksvcNSName, err)
 	}
 	f.Images = image
 
-	kpa, err := autoscalingClient.PodAutoscalers(f.ksvcNSName).Get(revisionName, metav1.GetOptions{})
+	kpa, err := autoscalingClient.PodAutoscalers(f.ksvcNSName).Get(context.Background(), revisionName, metav1.GetOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to get Knative podautoscaler resources for Knative Service %s / Revision %s under namespace %s! Error: %v", f.ksvcName, revisionName, f.ksvcNSName, err)
 	}
 	f.KPA = kpa
 
-	metrics, err := autoscalingClient.Metrics(f.ksvcNSName).Get(revisionName, metav1.GetOptions{})
+	metrics, err := autoscalingClient.Metrics(f.ksvcNSName).Get(context.Background(), revisionName, metav1.GetOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to get Knative metrics resources for Knative Service %s / Revision %s under namespace %s! Error: %v", f.ksvcName, revisionName, f.ksvcNSName, err)
 	}
 	f.Metrics = metrics
 
-	sks, err := networkingClient.ServerlessServices(f.ksvcNSName).Get(revisionName, metav1.GetOptions{})
+	sks, err := networkingClient.ServerlessServices(f.ksvcNSName).Get(context.Background(), revisionName, metav1.GetOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to get Knative ServerlessService resources for Knative Service %s / Revision %s under namespace %s! Error: %v", f.ksvcName, revisionName, f.ksvcNSName, err)
 	}
 	f.SKS = sks
 
-	publicsvc, err := k8sClient.CoreV1().Services(f.ksvcNSName).Get(revisionName, metav1.GetOptions{})
+	publicsvc, err := k8sClient.CoreV1().Services(f.ksvcNSName).Get(context.Background(), revisionName, metav1.GetOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to get K8S public service for Knative Service %s / Revision %s under namespace %s! Error: %v", f.ksvcName, revisionName, f.ksvcNSName, err)
 	}
 	f.SKSPublicSVC = publicsvc
 
-	privatesvc, err := k8sClient.CoreV1().Services(f.ksvcNSName).Get(revisionName+"-private", metav1.GetOptions{})
+	privatesvc, err := k8sClient.CoreV1().Services(f.ksvcNSName).Get(context.Background(), revisionName+"-private", metav1.GetOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to get K8S public service for Knative Service %s / Revision %s under namespace %s! Error: %v", f.ksvcName, revisionName, f.ksvcNSName, err)
 	}
 	f.SKSPrivateSVC = privatesvc
 
-	publicep, err := k8sClient.CoreV1().Endpoints(f.ksvcNSName).Get(revisionName, metav1.GetOptions{})
+	publicep, err := k8sClient.CoreV1().Endpoints(f.ksvcNSName).Get(context.Background(), revisionName, metav1.GetOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to get K8S public endpoint for Knative Service %s / Revision %s under namespace %s! Error: %v", f.ksvcName, revisionName, f.ksvcNSName, err)
 	}
 	f.SKSPublicEndpoint = publicep
 
-	privateep, err := k8sClient.CoreV1().Endpoints(f.ksvcNSName).Get(revisionName+"-private", metav1.GetOptions{})
+	privateep, err := k8sClient.CoreV1().Endpoints(f.ksvcNSName).Get(context.Background(), revisionName+"-private", metav1.GetOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to get K8S public endpoint for Knative Service %s / Revision %s under namespace %s! Error: %v", f.ksvcName, revisionName, f.ksvcNSName, err)
 	}
 	f.PrivateEendpoint = privateep
 
-	routes, err := servingClient.Routes(f.ksvcNSName).Get(f.ksvcName, metav1.GetOptions{})
+	routes, err := servingClient.Routes(f.ksvcNSName).Get(context.Background(), f.ksvcName, metav1.GetOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to get Knative Routes resources for Knative Service %s under namespace %s! Error: %v", f.ksvcName, f.ksvcNSName, err)
 	}
 	f.Routes = routes
 
-	externalsvc, err := k8sClient.CoreV1().Services(f.ksvcNSName).Get(f.ksvcName, metav1.GetOptions{})
+	externalsvc, err := k8sClient.CoreV1().Services(f.ksvcNSName).Get(context.Background(), f.ksvcName, metav1.GetOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to get K8S external public service for Knative Service %s / Revision %s under namespace %s! Error: %v", f.ksvcName, revisionName, f.ksvcNSName, err)
 	}
 	f.RoutesSVC = externalsvc
 
-	king, err := networkingClient.Ingresses(f.ksvcNSName).Get(f.ksvcName, metav1.GetOptions{})
+	king, err := networkingClient.Ingresses(f.ksvcNSName).Get(context.Background(), f.ksvcName, metav1.GetOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to get Knative Ingress resources for Knative Service %s under namespace %s! Error: %v", f.ksvcName, f.ksvcNSName, err)
 	}
