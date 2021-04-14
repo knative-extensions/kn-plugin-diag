@@ -131,7 +131,7 @@ func (f *Fetcher) GetKSVCResources() error {
 		LabelSelector: serving.RevisionLabelKey + "=" + lastCreatedRevisionName,
 		Limit:         2,
 	}
-	replicaList, err := k8sClient.AppsV1().ReplicaSets(f.ksvcNSName).List(listOptions)
+	replicaList, err := k8sClient.AppsV1().ReplicaSets(f.ksvcNSName).List(context.Background(), listOptions)
 	if err != nil {
 		return fmt.Errorf("failed to get K8S repliaset info for Knative Service %s / Revision %s under namespace %s! Error: %v", f.ksvcName, lastCreatedRevisionName, f.ksvcNSName, err)
 	}
@@ -139,7 +139,7 @@ func (f *Fetcher) GetKSVCResources() error {
 		f.Replicaset = &replicaList.Items[0]
 	}
 
-	podsList, err := k8sClient.CoreV1().Pods(f.ksvcNSName).List(listOptions)
+	podsList, err := k8sClient.CoreV1().Pods(f.ksvcNSName).List(context.Background(), listOptions)
 	if err != nil {
 		return fmt.Errorf("failed to get K8S pods info for Knative Service %s / Revision %s under namespace %s! Error: %v", f.ksvcName, lastCreatedRevisionName, f.ksvcNSName, err)
 	}
