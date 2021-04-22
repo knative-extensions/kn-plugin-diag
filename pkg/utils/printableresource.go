@@ -97,7 +97,7 @@ func (res *PrintableResource) dumpSubTable(rows [][]string, requireSeperator boo
 	for _, row := range rows {
 		subtable.Add(row)
 	}
-	return subtable.PrintDump()
+	return subtable.PrintDump(false)
 }
 
 func (res *PrintableResource) DumpResource() [][]string {
@@ -139,15 +139,15 @@ func (res *PrintableResource) DumpResource() [][]string {
 	case "conditions":
 		conditions := res.dumpSubTable(res.conditions, false)
 		if len(conditions) == 0 {
-			row = []string{paddingFirstLine + res.typeName, res.name, ""}
+			row = []string{paddingFirstLine + res.typeName, res.name, res.createdAt, ""}
 			data = append(data, row)
 		} else {
 			for i := 0; i < len(conditions); i++ {
 				c := conditions[i]
 				if i == 0 {
-					row = []string{paddingFirstLine + res.typeName, res.name, c}
+					row = []string{paddingFirstLine + res.typeName, res.name, res.createdAt, c}
 				} else {
-					row = []string{paddingSubLines, "", c}
+					row = []string{paddingSubLines, "", "", c}
 				}
 				data = append(data, row)
 			}

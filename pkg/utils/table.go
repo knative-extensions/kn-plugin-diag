@@ -31,7 +31,7 @@ type Table interface {
 	Add(row []string)
 	AddMuitpleRows(rows [][]string)
 	Print()
-	PrintDump() []string
+	PrintDump(wrapEnabled bool) []string
 	SetSeperator(bool)
 	SetHeaderPrinted(bool)
 }
@@ -78,7 +78,7 @@ func (t *PrintableTable) AddMuitpleRows(rows [][]string) {
 	}
 }
 
-func (t *PrintableTable) PrintDump() []string {
+func (t *PrintableTable) PrintDump(wrapEnabled bool) []string {
 	for _, row := range append(t.rows, t.headers) {
 		t.calculateMaxSize(row)
 	}
@@ -97,13 +97,21 @@ func (t *PrintableTable) PrintDump() []string {
 				maxSize = len(line)
 			}
 			if len(line) > t.terminalWidth {
-				dumps = append(dumps, line[0:t.terminalWidth])
-				indexOfSubline := strings.Index(line, "| ")
-				indexOfHeaderline := strings.Index(line, "|---") + 4
-				if indexOfSubline != -1 {
-					dumps = append(dumps, line[0:indexOfSubline]+"|"+strings.Repeat(" ", 2*t.terminalWidth-len(line)-indexOfSubline-1)+line[t.terminalWidth:])
+				if wrapEnabled {
+					dumps = append(dumps, line[0:t.terminalWidth])
+					lengthofplaceholder := strings.Index(line, "| ")
+					if lengthofplaceholder == -1 {
+						lengthofplaceholder = strings.Index(line, "|---") + 4
+					}
+					if lengthofplaceholder != -1 && lengthofplaceholder < 2*t.terminalWidth {
+						linewraping := line[t.terminalWidth:]
+						if 2*t.terminalWidth < len(line) {
+							linewraping = line[t.terminalWidth : 2*t.terminalWidth-lengthofplaceholder-1]
+						}
+						dumps = append(dumps, strings.Repeat(" ", lengthofplaceholder)+"|"+strings.Repeat(" ", t.terminalWidth-len(linewraping)-lengthofplaceholder-1)+linewraping)
+					}
 				} else {
-					dumps = append(dumps, strings.Repeat(" ", indexOfHeaderline)+"|"+strings.Repeat(" ", 2*t.terminalWidth-len(line)-indexOfHeaderline-1)+line[t.terminalWidth:])
+					dumps = append(dumps, line[0:t.terminalWidth])
 				}
 			} else {
 				dumps = append(dumps, line)
@@ -135,7 +143,7 @@ func (t *PrintableTable) PrintDump() []string {
 }
 
 func (t *PrintableTable) Print() {
-	for _, row := range t.PrintDump() {
+	for _, row := range t.PrintDump(true) {
 		fmt.Fprintln(t.writer, row)
 	}
 }
