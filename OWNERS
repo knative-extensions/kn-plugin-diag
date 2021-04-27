@@ -1,11 +1,5 @@
 approvers:
-- cdlliuy 
-- rhuss
-- maximilien
-- navidshaikh
-# Also including TOC members as backup:
-- evankanderson
-- grantr
-- markusthoemmes
-- mattmoor
-- tcnghia
+- technical-oversight-committee
+- knative-release-leads
+- client-writers
+- kn-plugin-diag-approvers
