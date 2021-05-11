@@ -17,7 +17,6 @@ limitations under the License.
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -33,14 +32,14 @@ func main() {
 
 	rootCmd := &cobra.Command{
 		Use:   "knative-diagnose",
-		Short: "A CLI of to help with Diagnose Knative Resources",
-		Long:  `A CLI of to help with Diagnose Knative Resources.`,
+		Short: "A plugin of Knative Client to show detail information of Knative Resources for diagnose purpose",
+		Long:  `It can be used to show the Knative Customer Resource Definition Hierarchy in a tree view, to show the status and key metadata and spec fileds of different Knative Customer Resource Definitions`,
 	}
 	rootCmd.AddCommand(diagnose.NewServiceCmd(p))
 	rootCmd.InitDefaultHelpCmd()
 
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Println("Failed : ", err)
+		utils.SayFailedMessage("Error:%v\n", err)
 		os.Exit(1)
 	}
 

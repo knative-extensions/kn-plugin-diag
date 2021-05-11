@@ -41,7 +41,7 @@ func (params *ConnectionConfig) Initialize() error {
 
 		params.ClientSet, err = kubernetes.NewForConfig(restConfig)
 		if err != nil {
-			fmt.Println("failed to create client:", err)
+			fmt.Println("Failed to create client:", err)
 			os.Exit(1)
 		}
 	}
