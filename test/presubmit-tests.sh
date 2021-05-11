@@ -1,6 +1,4 @@
-#!/bin/bash
-
-# Copyright 2021 The Knative Authors
+# Copyright 2020 The Knative Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,4 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-exit 0
+# ==========================================
+# Unit and Build tests
+
+
+# We can't use MD checks now as they will propagate into
+# the plugins' vendor/ dir
+# (the filter in markdown_build_tests() in test-infra/scripts/presumit-tests.sh is
+# not strong enough
+export DISABLE_MD_LINTING=1
+export DISABLE_MD_LINK_CHECK=1
+export PRESUBMIT_TEST_FAIL_FAST=1
+export GO111MODULE=on
+source $(dirname $0)/../vendor/knative.dev/hack/presubmit-tests.sh
+
+# Run the unit tests with an additional flag '-mod=vendor' to avoid
+# downloading the deps in unit tests CI job
+# function unit_tests() {
+#   report_go_test -race -mod=vendor ./... || failed=1
+# }
+
+# We use the default build and integration test runners.
+main "$@"
