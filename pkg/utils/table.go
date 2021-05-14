@@ -91,34 +91,40 @@ func (t *PrintableTable) PrintDump(wrapEnabled bool) []string {
 	dumps := []string{}
 	maxSize := 0
 	for _, row := range t.rows {
-		if len(row) != 0 {
-			line := t.printRowString(row)
-			if len(line) > maxSize {
-				maxSize = len(line)
-			}
-			if len(line) > t.terminalWidth {
-				if wrapEnabled {
-					dumps = append(dumps, line[0:t.terminalWidth])
-					lengthofplaceholder := strings.Index(line, "| ")
-					if lengthofplaceholder == -1 {
-						lengthofplaceholder = strings.Index(line, "|---") + 4
-					}
-					if lengthofplaceholder != -1 && lengthofplaceholder < 2*t.terminalWidth {
-						linewraping := line[t.terminalWidth:]
-						if 2*t.terminalWidth < len(line) {
-							linewraping = line[t.terminalWidth : 2*t.terminalWidth-lengthofplaceholder-1]
-						}
-						dumps = append(dumps, strings.Repeat(" ", lengthofplaceholder)+"|"+strings.Repeat(" ", t.terminalWidth-len(linewraping)-lengthofplaceholder-1)+linewraping)
-					}
-				} else {
-					dumps = append(dumps, line[0:t.terminalWidth])
-				}
-			} else {
-				dumps = append(dumps, line)
-			}
-		} else {
+		if len(row) == 0 {
 			dumps = append(dumps, "")
+			continue
 		}
+		line := t.printRowString(row)
+		if len(line) > maxSize {
+			maxSize = len(line)
+		}
+		if len(line) < t.terminalWidth {
+			dumps = append(dumps, line)
+			continue
+		}
+		if !wrapEnabled {
+			dumps = append(dumps, line[0:t.terminalWidth])
+			continue
+		}
+
+		dumps = append(dumps, line[0:t.terminalWidth])
+		lengthofplaceholder := strings.Index(line, "| ")
+		if lengthofplaceholder == -1 {
+			lengthofplaceholder = strings.Index(line, "|---") + 4
+		}
+		if lengthofplaceholder != -1 && lengthofplaceholder < 2*t.terminalWidth {
+			linewraping := line[t.terminalWidth:]
+			if len(linewraping) > t.terminalWidth-lengthofplaceholder && len(line) > 2*t.terminalWidth-lengthofplaceholder {
+				linewraping = line[t.terminalWidth : 2*t.terminalWidth-lengthofplaceholder-1]
+			}
+			paddinglength := t.terminalWidth - lengthofplaceholder - 1 - len(linewraping)
+			if paddinglength < 0 {
+				paddinglength = 0
+			}
+			dumps = append(dumps, strings.Repeat(" ", lengthofplaceholder)+"|"+strings.Repeat(" ", paddinglength)+linewraping)
+		}
+
 	}
 
 	if maxSize > t.terminalWidth {
