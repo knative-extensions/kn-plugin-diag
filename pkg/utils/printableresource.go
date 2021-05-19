@@ -119,6 +119,7 @@ func (res *PrintableResource) DumpResource() [][]string {
 	startSubLines := "    |"
 	blanking := "    "
 
+	//preprea for the tree format
 	paddingFirstLine := ""
 	paddingSubLines := ""
 	if res.level > 0 {
@@ -129,54 +130,52 @@ func (res *PrintableResource) DumpResource() [][]string {
 		paddingSubLines = "|"
 	}
 
+	//make the content
 	data := [][]string{}
 	switch res.verboseType {
 	case "keyinfo":
-		data = res.dumpToMultipleRows(res.keyInfo, paddingFirstLine, paddingSubLines, []string{res.typeName, res.name}...)
+		data = res.dumpToMultipleRows(paddingFirstLine, paddingSubLines, res.keyInfo, res.typeName, res.name)
 	default:
-		data = res.dumpToMultipleRows(res.conditions, paddingFirstLine, paddingSubLines, []string{res.typeName, res.name, res.createdAt}...)
+		data = res.dumpToMultipleRows(paddingFirstLine, paddingSubLines, res.conditions, res.typeName, res.name, []string{res.createdAt}...)
 	}
 
 	return data
 }
 
-func (res *PrintableResource) dumpToMultipleRows(elements [][]string, paddingFirstLine, paddingSubLines string, fixedColumns ...string) [][]string {
+func (res *PrintableResource) dumpToMultipleRows(paddingFirstLine, paddingSubLines string, elements [][]string, resTypeName, resName string, otherfixedColumns ...string) [][]string {
 
 	data := [][]string{}
 	var row []string
 	subtableRows := res.dumpSubTable(elements, false)
-	//empty conditions, we need to copy the fixed columns
+
+	//for status.conditions == nil, no subtable, but we need to copy the otherfixedColumns items for the final table
 	if len(subtableRows) == 0 {
-		if len(fixedColumns) != 0 {
-			row = []string{paddingFirstLine + fixedColumns[0]}
-			for j := 1; j < len(fixedColumns); j++ {
-				row = append(row, fixedColumns[j])
-			}
+		row = []string{paddingFirstLine + resTypeName, resName}
+		for j := 0; j < len(otherfixedColumns); j++ {
+			row = append(row, otherfixedColumns[j])
 		}
 		row = append(row, "")
 		data = append(data, row)
-	} else {
-		for i := 0; i < len(subtableRows); i++ {
-			r := subtableRows[i]
-			if i == 0 { //header line
-				if len(fixedColumns) != 0 {
-					row = []string{paddingFirstLine + fixedColumns[0]}
-					for j := 1; j < len(fixedColumns); j++ {
-						row = append(row, fixedColumns[j])
-					}
-				}
-			} else {
-				if len(fixedColumns) != 0 {
-					row = []string{paddingSubLines}
-					for j := 1; j < len(fixedColumns); j++ {
-						row = append(row, "")
-					}
-				}
-			}
-			row = append(row, r) //append the subtable row info
-			data = append(data, row)
-		}
+		return data
 	}
+
+	for i := 0; i < len(subtableRows); i++ {
+		r := subtableRows[i]
+		if i == 0 { //header line
+			row = []string{paddingFirstLine + resTypeName, resName}
+			for j := 0; j < len(otherfixedColumns); j++ {
+				row = append(row, otherfixedColumns[j])
+			}
+		} else {
+			row = []string{paddingSubLines, ""}
+			for j := 0; j < len(otherfixedColumns); j++ {
+				row = append(row, "")
+			}
+		}
+		row = append(row, r) //append the subtable row info
+		data = append(data, row)
+	}
+
 	return data
 }
 
@@ -212,7 +211,7 @@ func (res *PrintableResource) addKeyInfoSliceDeepFirstRetrieve(keyPrefix string,
 
 	vv, ok, err := unstructured.NestedFieldNoCopy(object, strings.Split(segment[depth], ".")...)
 	if !ok || err != nil {
-		SayWarningMessage("Failed to load key info %s for %s %s, %v\n", keyPrefix, crName, objName, err)
+		SayWarningMessage("Missing key info %s for %s %s, %v\n", keyPrefix, crName, objName, err)
 		return nil
 	}
 
@@ -256,7 +255,7 @@ func (res *PrintableResource) AddKeyInfo(keyInfo []string, objectNode *ObjectNod
 			//no slice included
 			val, ok, err := unstructured.NestedFieldNoCopy(object, strings.Split(key, ".")...)
 			if !ok || err != nil {
-				SayWarningMessage("Failed to load key info %s for %s %s, %v\n", key, objectNode.CRName, objectNode.ObjectName, err)
+				SayWarningMessage("Missing key info %s for %s %s, %v\n", key, objectNode.CRName, objectNode.ObjectName, err)
 				continue
 			}
 			res.addKeyInfoRows(objectNode.CRName, key, val)
@@ -271,7 +270,7 @@ func (res *PrintableResource) AddKeyInfo(keyInfo []string, objectNode *ObjectNod
 			}
 			err := res.addKeyInfoSliceDeepFirstRetrieve("", object, 0, segment, objectNode.CRName, objectNode.ObjectName)
 			if err != nil {
-				SayWarningMessage("Failed to load key info %s for %s %s, %v\n", key, objectNode.CRName, objectNode.ObjectName, err)
+				SayWarningMessage("Missing key info %s for %s %s, %v\n", key, objectNode.CRName, objectNode.ObjectName, err)
 				continue
 			}
 		} //end of else
