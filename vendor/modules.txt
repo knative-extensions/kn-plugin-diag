@@ -582,7 +582,7 @@ k8s.io/kube-openapi/pkg/util/proto
 k8s.io/utils/buffer
 k8s.io/utils/integer
 k8s.io/utils/trace
-# knative.dev/client v0.23.0
+# knative.dev/client v0.23.1-0.20210520163617-d0327bca0766
 ## explicit
 knative.dev/client/lib/test
 knative.dev/client/pkg/apis/client
@@ -638,7 +638,7 @@ knative.dev/pkg/tracing/config
 knative.dev/pkg/tracing/propagation
 knative.dev/pkg/tracing/propagation/tracecontextb3
 knative.dev/pkg/tracker
-# knative.dev/serving v0.23.1-0.20210520141217-a59495bbd17d
+# knative.dev/serving v0.23.1-0.20210521110217-5a0ea08fd7db
 ## explicit
 knative.dev/serving/pkg/apis/autoscaling
 knative.dev/serving/pkg/apis/autoscaling/v1alpha1
