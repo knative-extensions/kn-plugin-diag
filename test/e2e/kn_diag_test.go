@@ -17,6 +17,7 @@
 package e2e
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
@@ -26,13 +27,12 @@ import (
 	"knative.dev/client/lib/test"
 )
 
-const pluginName string = "admin"
+const pluginName string = "diag"
 
 type e2eTest struct {
-	it         *testcommon.E2ETest
-	kn         *test.Kn
-	kubectl    *test.Kubectl
-	backupData map[string]string
+	it      *testcommon.E2ETest
+	kn      *test.Kn
+	kubectl *test.Kubectl
 }
 
 func newE2ETest(t *testing.T) *e2eTest {
@@ -49,10 +49,9 @@ func newE2ETest(t *testing.T) *e2eTest {
 	kn := test.NewKn()
 	kubectl := test.NewKubectl("knative-serving")
 	e2eTest := &e2eTest{
-		it:         it,
-		kn:         &kn,
-		kubectl:    &kubectl,
-		backupData: make(map[string]string),
+		it:      it,
+		kn:      &kn,
+		kubectl: &kubectl,
 	}
 	return e2eTest
 }
@@ -72,6 +71,24 @@ func TestKnDiagPlugin(t *testing.T) {
 	err := e2eTest.it.KnPlugin().Install()
 	assert.NilError(t, err)
 
+	ksvcName := "kn-diag-e2etest"
+	knResultOut := e2eTest.kn.Run("service", "create", ksvcName, "--image", "gcr.io/knative-samples/autoscale-go:0.1")
+	r.AssertNoError(knResultOut)
+	out, err := e2eTest.kubectl.Run("config", "current-context")
+	assert.NilError(t, err)
+	fmt.Printf("kubectl config current-context:%s\n", out)
+	out, err = e2eTest.kubectl.Run("config", "view")
+	assert.NilError(t, err)
+	fmt.Printf("kubectl config view:%s\n", out)
+
+	e2eTest.knDiag(t, r, ksvcName)
 	err = e2eTest.it.KnPlugin().Uninstall()
 	assert.NilError(t, err)
+}
+
+func (et *e2eTest) knDiag(t *testing.T, r *test.KnRunResultCollector, ksvcName string) {
+	out := et.kn.Run(pluginName, "service", ksvcName)
+	r.AssertNoError(out)
+	out = et.kn.Run(pluginName, "service", ksvcName, "--verbose", "keyinfo")
+	r.AssertNoError(out)
 }

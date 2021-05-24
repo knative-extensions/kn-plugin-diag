@@ -20,7 +20,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
+	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"knative.dev/kn-plugin-diag/pkg/command/diagnose"
 	"knative.dev/kn-plugin-diag/pkg/utils"
 )
