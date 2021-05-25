@@ -48,6 +48,9 @@ type PrintableTable struct {
 
 func NewTable(w io.Writer, headers []string) Table {
 	x, _ := terminal.Width()
+	if x == 0 {
+		x = 200
+	}
 	return &PrintableTable{
 		writer:           w,
 		headers:          headers,

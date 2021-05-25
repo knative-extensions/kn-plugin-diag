@@ -17,7 +17,6 @@
 package e2e
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
@@ -25,6 +24,7 @@ import (
 	testcommon "github.com/maximilien/kn-source-pkg/test/e2e"
 	"gotest.tools/v3/assert"
 	"knative.dev/client/lib/test"
+	"knative.dev/client/pkg/util"
 )
 
 const pluginName string = "diag"
@@ -72,23 +72,28 @@ func TestKnDiagPlugin(t *testing.T) {
 	assert.NilError(t, err)
 
 	ksvcName := "kn-diag-e2etest"
+	//prerequieste for the kn-diag test
 	knResultOut := e2eTest.kn.Run("service", "create", ksvcName, "--image", "gcr.io/knative-samples/autoscale-go:0.1")
 	r.AssertNoError(knResultOut)
-	out, err := e2eTest.kubectl.Run("config", "current-context")
-	assert.NilError(t, err)
-	fmt.Printf("kubectl config current-context:%s\n", out)
-	out, err = e2eTest.kubectl.Run("config", "view")
-	assert.NilError(t, err)
-	fmt.Printf("kubectl config view:%s\n", out)
 
-	e2eTest.knDiag(t, r, ksvcName)
+	e2eTest.testKnDiagDefault(t, r, ksvcName)
+	e2eTest.testKnDiagKeyInfo(t, r, ksvcName)
+
 	err = e2eTest.it.KnPlugin().Uninstall()
 	assert.NilError(t, err)
 }
 
-func (et *e2eTest) knDiag(t *testing.T, r *test.KnRunResultCollector, ksvcName string) {
+func (et *e2eTest) testKnDiagDefault(t *testing.T, r *test.KnRunResultCollector, ksvcName string) {
 	out := et.kn.Run(pluginName, "service", ksvcName)
 	r.AssertNoError(out)
-	out = et.kn.Run(pluginName, "service", ksvcName, "--verbose", "keyinfo")
+	assert.Check(t, util.ContainsAll(out.Stdout, "ksvc", ksvcName, "ConfigurationsReady", "RoutesReady", "Ready"))
+	assert.Check(t, util.ContainsAll(out.Stdout, "revision", ksvcName, "ContainerHealthy", "ResourcesAvailable", "Ready", "Active"))
+	assert.Check(t, util.ContainsAll(out.Stdout, "route", ksvcName, "AllTrafficAssigned", "CertificateProvisioned", "IngressReady", "Ready"))
+}
+
+func (et *e2eTest) testKnDiagKeyInfo(t *testing.T, r *test.KnRunResultCollector, ksvcName string) {
+	out := et.kn.Run(pluginName, "service", ksvcName, "--verbose", "keyinfo")
 	r.AssertNoError(out)
+	assert.Check(t, util.ContainsAll(out.Stdout, "ksvc", ksvcName, "status.url"))
+	assert.Check(t, util.ContainsAll(out.Stdout, "revision", ksvcName, "spec.replicas"))
 }
