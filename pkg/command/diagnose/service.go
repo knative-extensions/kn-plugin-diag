@@ -24,7 +24,7 @@ import (
 	"github.com/spf13/cobra"
 	. "knative.dev/kn-plugin-diag/pkg/utils"
 
-	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
+	_ "k8s.io/client-go/plugin/pkg/client/auth"
 )
 
 var (

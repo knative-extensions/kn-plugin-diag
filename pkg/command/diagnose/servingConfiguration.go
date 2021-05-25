@@ -364,22 +364,6 @@ func (sc *ServingConfiguration) buildObjectHierarchy(crNode *CRNode, parentObjec
 
 }
 
-func (sc *ServingConfiguration) deepFirstRetrieve(node *CRNode, depth int) {
-
-	if node == nil {
-		return
-	}
-	if depth == 0 {
-		fmt.Printf("%s(0)\n", node.Name)
-	} else {
-		fmt.Printf("|%s %s(%d)\n", strings.Repeat("-", depth*2-1), node.Name, depth)
-	}
-	for _, leaf := range node.Leaves {
-		sc.deepFirstRetrieve(leaf, depth+1)
-	}
-
-}
-
 func (sc *ServingConfiguration) deepFirstRetrieveObjects(node *ObjectNode, depth int, table Table, verbose string) error {
 
 	if node == nil {
