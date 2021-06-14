@@ -4,14 +4,13 @@ go 1.15
 
 require (
 	github.com/fatih/color v1.9.0
-	github.com/imdario/mergo v0.3.10 // indirect
 	github.com/maximilien/kn-source-pkg v0.6.3
 	github.com/spf13/cobra v1.1.3
 	github.com/wayneashleyberry/terminal-dimensions v1.0.0
 	gotest.tools/v3 v3.0.3
-	k8s.io/apimachinery v0.19.7
-	k8s.io/client-go v0.19.7
-	knative.dev/client v0.23.1-0.20210601172337-67bbe37afa60
-	knative.dev/hack v0.0.0-20210601210329-de04b70e00d0
-	knative.dev/serving v0.23.1-0.20210602145637-966f01547a16
+	k8s.io/apimachinery v0.20.7
+	k8s.io/client-go v0.20.7
+	knative.dev/client v0.23.1-0.20210614133120-935c2a5303ac
+	knative.dev/hack v0.0.0-20210614141220-66ab1a098940
+	knative.dev/serving v0.23.1-0.20210614141420-380a090c2039
 )
