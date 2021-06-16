@@ -12,5 +12,5 @@ require (
 	k8s.io/client-go v0.20.7
 	knative.dev/client v0.23.1-0.20210614133120-935c2a5303ac
 	knative.dev/hack v0.0.0-20210614141220-66ab1a098940
-	knative.dev/serving v0.23.1-0.20210615120021-36883dac035a
+	knative.dev/serving v0.23.1-0.20210616140421-c9cdc34736ad
 )
