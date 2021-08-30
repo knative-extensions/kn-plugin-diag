@@ -8,9 +8,9 @@ require (
 	github.com/spf13/cobra v1.2.1
 	github.com/wayneashleyberry/terminal-dimensions v1.0.0
 	gotest.tools/v3 v3.0.3
-	k8s.io/apimachinery v0.20.7
-	k8s.io/client-go v0.20.7
-	knative.dev/client v0.24.1-0.20210810133812-28a340cce741
-	knative.dev/hack v0.0.0-20210622141627-e28525d8d260
-	knative.dev/serving v0.24.1-0.20210806230708-5ad15dff1c94
+	k8s.io/apimachinery v0.21.4
+	k8s.io/client-go v0.21.4
+	knative.dev/client v0.25.1-0.20210830145628-7e90dca8f3b4
+	knative.dev/hack v0.0.0-20210806075220-815cd312d65c
+	knative.dev/serving v0.25.1-0.20210830131335-1c25327e9a67
 )
