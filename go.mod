@@ -10,7 +10,7 @@ require (
 	gotest.tools/v3 v3.0.3
 	k8s.io/apimachinery v0.21.4
 	k8s.io/client-go v0.21.4
-	knative.dev/client v0.26.1-0.20211014105642-b1e4132be8b5
+	knative.dev/client v0.26.1-0.20211018155636-a736af7129a1
 	knative.dev/hack v0.0.0-20211018110626-47ac3b032e60
-	knative.dev/serving v0.26.1-0.20211018070726-30087cd94810
+	knative.dev/serving v0.26.1-0.20211018142437-2dc26f102ade
 )
