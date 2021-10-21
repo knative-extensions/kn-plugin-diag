@@ -1,4 +1,4 @@
-# cloud.google.com/go v0.96.0
+# cloud.google.com/go v0.97.0
 cloud.google.com/go/compute/metadata
 # github.com/Azure/go-autorest v14.2.0+incompatible
 github.com/Azure/go-autorest
@@ -124,7 +124,7 @@ go.uber.org/zap/zapcore
 # golang.org/x/crypto v0.0.0-20210817164053-32db794688a5
 golang.org/x/crypto/pkcs12
 golang.org/x/crypto/pkcs12/internal/rc2
-# golang.org/x/net v0.0.0-20210928044308-7d9f5e0b762b
+# golang.org/x/net v0.0.0-20211015210444-4f30a5c0130f
 golang.org/x/net/context
 golang.org/x/net/context/ctxhttp
 golang.org/x/net/http/httpguts
@@ -132,7 +132,7 @@ golang.org/x/net/http2
 golang.org/x/net/http2/h2c
 golang.org/x/net/http2/hpack
 golang.org/x/net/idna
-# golang.org/x/oauth2 v0.0.0-20210819190943-2bc19b11175f
+# golang.org/x/oauth2 v0.0.0-20211005180243-6b3c2da341f1
 golang.org/x/oauth2
 golang.org/x/oauth2/authhandler
 golang.org/x/oauth2/google
@@ -432,13 +432,13 @@ k8s.io/klog/v2
 k8s.io/utils/buffer
 k8s.io/utils/integer
 k8s.io/utils/trace
-# knative.dev/client v0.26.1-0.20211018155636-a736af7129a1
+# knative.dev/client v0.26.1-0.20211019150534-534d91319f7d
 ## explicit
 knative.dev/client/lib/test
 knative.dev/client/pkg/apis/client
 knative.dev/client/pkg/apis/client/v1alpha1
 knative.dev/client/pkg/util
-# knative.dev/eventing v0.26.1-0.20211018070726-5f69768e8d01
+# knative.dev/eventing v0.26.1-0.20211019092333-7af98bbb4491
 knative.dev/eventing/pkg/apis/config
 knative.dev/eventing/pkg/apis/duck
 knative.dev/eventing/pkg/apis/duck/v1
@@ -448,14 +448,14 @@ knative.dev/eventing/pkg/apis/feature
 knative.dev/eventing/pkg/apis/messaging
 knative.dev/eventing/pkg/apis/messaging/config
 knative.dev/eventing/pkg/apis/messaging/v1
-# knative.dev/hack v0.0.0-20211018110626-47ac3b032e60
+# knative.dev/hack v0.0.0-20211019034732-ced8ce706528
 ## explicit
 knative.dev/hack
-# knative.dev/networking v0.0.0-20211018053525-91e7d042db3d
+# knative.dev/networking v0.0.0-20211019132235-c8d647402afa
 knative.dev/networking/pkg
 knative.dev/networking/pkg/apis/networking
 knative.dev/networking/pkg/apis/networking/v1alpha1
-# knative.dev/pkg v0.0.0-20211018071527-3463dd75659d
+# knative.dev/pkg v0.0.0-20211019132235-ba2b2b1bf268
 knative.dev/pkg/apis
 knative.dev/pkg/apis/duck
 knative.dev/pkg/apis/duck/ducktypes
@@ -481,7 +481,7 @@ knative.dev/pkg/tracing/config
 knative.dev/pkg/tracing/propagation
 knative.dev/pkg/tracing/propagation/tracecontextb3
 knative.dev/pkg/tracker
-# knative.dev/serving v0.26.1-0.20211018142437-2dc26f102ade
+# knative.dev/serving v0.26.1-0.20211021084312-85e7705a87b6
 ## explicit
 knative.dev/serving/pkg/apis/autoscaling
 knative.dev/serving/pkg/apis/autoscaling/v1alpha1
