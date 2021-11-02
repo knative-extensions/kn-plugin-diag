@@ -1,5 +1,7 @@
 # kn-diag
 
+**[This component is ALPHA](https://github.com/knative/community/tree/main/mechanics/MATURITY-LEVELS.md)**
+
 ## Introduction
 
 kn-diag is a tool to expose information and status of knative resources to
