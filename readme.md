@@ -1,5 +1,7 @@
 # kn-diag
 
+**[This component is ALPHA](https://github.com/knative/community/tree/main/mechanics/MATURITY-LEVELS.md)**
+
 ## Introduction
 
 The `kn-diag` is a plugin of `Knative client`. It is designed to expose information and status of different level of knative resources end-user to facilitate for problem diagnose purpose.
