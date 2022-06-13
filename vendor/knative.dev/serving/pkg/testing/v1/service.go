@@ -182,13 +182,6 @@ func WithRevisionTimeoutSeconds(revisionTimeoutSeconds int64) ServiceOption {
 	}
 }
 
-// WithMaxDurationSeconds sets revision max duration timeout
-func WithMaxDurationSeconds(maxDurationSeconds int64) ServiceOption {
-	return func(service *v1.Service) {
-		service.Spec.Template.Spec.MaxDurationSeconds = ptr.Int64(maxDurationSeconds)
-	}
-}
-
 // WithServiceAccountName sets revision service account name
 func WithServiceAccountName(serviceAccountName string) ServiceOption {
 	return func(service *v1.Service) {
@@ -488,8 +481,22 @@ var (
 	}
 )
 
+// WithInitContainer adds init container to a service.
 func WithInitContainer(p corev1.Container) ServiceOption {
 	return func(s *v1.Service) {
 		s.Spec.Template.Spec.InitContainers = []corev1.Container{p}
+	}
+}
+
+// WithPodSecurityContext assigns security context to a service.
+func WithPodSecurityContext(secCtx corev1.PodSecurityContext) ServiceOption {
+	return func(s *v1.Service) {
+		s.Spec.Template.Spec.SecurityContext = &secCtx
+	}
+}
+
+func WithNamespace(namespace string) ServiceOption {
+	return func(svc *v1.Service) {
+		svc.ObjectMeta.Namespace = namespace
 	}
 }
