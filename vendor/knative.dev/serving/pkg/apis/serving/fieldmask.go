@@ -33,21 +33,12 @@ func VolumeMask(ctx context.Context, in *corev1.Volume) *corev1.Volume {
 	if in == nil {
 		return nil
 	}
-	cfg := config.FromContextOrDefaults(ctx)
 
 	out := new(corev1.Volume)
 
 	// Allowed fields
 	out.Name = in.Name
 	out.VolumeSource = in.VolumeSource
-
-	if cfg.Features.PodSpecVolumesEmptyDir != config.Disabled {
-		out.EmptyDir = in.EmptyDir
-	}
-
-	if cfg.Features.PodSpecPersistentVolumeClaim != config.Disabled {
-		out.PersistentVolumeClaim = in.PersistentVolumeClaim
-	}
 
 	return out
 }
@@ -200,6 +191,9 @@ func PodSpecMask(ctx context.Context, in *corev1.PodSpec) *corev1.PodSpec {
 	if cfg.Features.PodSpecAffinity != config.Disabled {
 		out.Affinity = in.Affinity
 	}
+	if cfg.Features.PodSpecTopologySpreadConstraints != config.Disabled {
+		out.TopologySpreadConstraints = in.TopologySpreadConstraints
+	}
 	if cfg.Features.PodSpecHostAliases != config.Disabled {
 		out.HostAliases = in.HostAliases
 	}
@@ -214,6 +208,9 @@ func PodSpecMask(ctx context.Context, in *corev1.PodSpec) *corev1.PodSpec {
 	}
 	if cfg.Features.PodSpecSecurityContext != config.Disabled {
 		out.SecurityContext = in.SecurityContext
+	} else if cfg.Features.SecurePodDefaults != config.Disabled {
+		// This is further validated in ValidatePodSecurityContext.
+		out.SecurityContext = in.SecurityContext
 	}
 	if cfg.Features.PodSpecPriorityClassName != config.Disabled {
 		out.PriorityClassName = in.PriorityClassName
@@ -224,13 +221,18 @@ func PodSpecMask(ctx context.Context, in *corev1.PodSpec) *corev1.PodSpec {
 	if cfg.Features.PodSpecInitContainers != config.Disabled {
 		out.InitContainers = in.InitContainers
 	}
+	if cfg.Features.PodSpecDNSPolicy != config.Disabled {
+		out.DNSPolicy = in.DNSPolicy
+	}
+	if cfg.Features.PodSpecDNSConfig != config.Disabled {
+		out.DNSConfig = in.DNSConfig
+	}
 
 	// Disallowed fields
 	// This list is unnecessary, but added here for clarity
 	out.RestartPolicy = ""
 	out.TerminationGracePeriodSeconds = nil
 	out.ActiveDeadlineSeconds = nil
-	out.DNSPolicy = ""
 	out.NodeName = ""
 	out.HostNetwork = false
 	out.HostPID = false
@@ -239,7 +241,6 @@ func PodSpecMask(ctx context.Context, in *corev1.PodSpec) *corev1.PodSpec {
 	out.Hostname = ""
 	out.Subdomain = ""
 	out.Priority = nil
-	out.DNSConfig = nil
 	out.ReadinessGates = nil
 
 	return out
@@ -317,7 +318,7 @@ func ProbeMask(in *corev1.Probe) *corev1.Probe {
 	out := new(corev1.Probe)
 
 	// Allowed fields
-	out.Handler = in.Handler
+	out.ProbeHandler = in.ProbeHandler
 	out.InitialDelaySeconds = in.InitialDelaySeconds
 	out.TimeoutSeconds = in.TimeoutSeconds
 	out.PeriodSeconds = in.PeriodSeconds
@@ -330,11 +331,11 @@ func ProbeMask(in *corev1.Probe) *corev1.Probe {
 // HandlerMask performs a _shallow_ copy of the Kubernetes Handler object to a new
 // Kubernetes Handler object bringing over only the fields allowed in the Knative API. This
 // does not validate the contents or the bounds of the provided fields.
-func HandlerMask(in *corev1.Handler) *corev1.Handler {
+func HandlerMask(in *corev1.ProbeHandler) *corev1.ProbeHandler {
 	if in == nil {
 		return nil
 	}
-	out := new(corev1.Handler)
+	out := new(corev1.ProbeHandler)
 
 	// Allowed fields
 	out.Exec = in.Exec
@@ -593,6 +594,19 @@ func PodSecurityContextMask(ctx context.Context, in *corev1.PodSecurityContext) 
 
 	out := new(corev1.PodSecurityContext)
 
+	if config.FromContextOrDefaults(ctx).Features.SecurePodDefaults == config.Enabled {
+		// Allow to opt out of more-secure defaults if SecurePodDefaults is enabled.
+		// This aligns with defaultSecurityContext in revision_defaults.go.
+		if in.SeccompProfile != nil {
+			seccomp := in.SeccompProfile.Type
+			if seccomp == corev1.SeccompProfileTypeRuntimeDefault || seccomp == corev1.SeccompProfileTypeUnconfined {
+				out.SeccompProfile = &corev1.SeccompProfile{
+					Type: seccomp,
+				}
+			}
+		}
+	}
+
 	if config.FromContextOrDefaults(ctx).Features.PodSpecSecurityContext == config.Disabled {
 		return out
 	}
@@ -602,12 +616,14 @@ func PodSecurityContextMask(ctx context.Context, in *corev1.PodSecurityContext) 
 	out.RunAsNonRoot = in.RunAsNonRoot
 	out.FSGroup = in.FSGroup
 	out.SupplementalGroups = in.SupplementalGroups
+	out.SeccompProfile = in.SeccompProfile
 
 	// Disallowed
 	// This list is unnecessary, but added here for clarity
 	out.SELinuxOptions = nil
 	out.WindowsOptions = nil
 	out.Sysctls = nil
+	out.FSGroupChangePolicy = nil
 
 	return out
 }
@@ -630,12 +646,17 @@ func SecurityContextMask(ctx context.Context, in *corev1.SecurityContext) *corev
 	// RunAsNonRoot when unset behaves the same way as false
 	// We do want the ability for folks to set this value to true
 	out.RunAsNonRoot = in.RunAsNonRoot
+	// AllowPrivilegeEscalation when unset can behave the same way as true
+	// We do want the ability for folks to set this value to false
+	out.AllowPrivilegeEscalation = in.AllowPrivilegeEscalation
+	// SeccompProfile defaults to "unconstrained", but the safe values are
+	// "RuntimeDefault" or "Localhost" (with localhost path set)
+	out.SeccompProfile = in.SeccompProfile
 
 	// Disallowed
 	// This list is unnecessary, but added here for clarity
 	out.Privileged = nil
 	out.SELinuxOptions = nil
-	out.AllowPrivilegeEscalation = nil
 	out.ProcMount = nil
 
 	return out
