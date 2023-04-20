@@ -23,7 +23,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"net/url"
@@ -188,7 +187,7 @@ func (sc *SpoofingClient) Poll(req *http.Request, inState ResponseChecker, check
 		}
 		defer rawResp.Body.Close()
 
-		body, err := ioutil.ReadAll(rawResp.Body)
+		body, err := io.ReadAll(rawResp.Body)
 		if err != nil {
 			return true, err
 		}
@@ -266,7 +265,7 @@ func DefaultResponseRetryChecker(resp *Response) (bool, error) {
 // logZipkinTrace provides support to log Zipkin Trace for param: spoofResponse
 // We only log Zipkin trace for HTTP server errors i.e for HTTP status codes between 500 to 600
 func (sc *SpoofingClient) logZipkinTrace(spoofResp *Response) {
-	if !zipkin.ZipkinTracingEnabled || spoofResp.StatusCode < http.StatusInternalServerError || spoofResp.StatusCode >= 600 {
+	if !zipkin.IsTracingEnabled() || spoofResp.StatusCode < http.StatusInternalServerError || spoofResp.StatusCode >= 600 {
 		return
 	}
 

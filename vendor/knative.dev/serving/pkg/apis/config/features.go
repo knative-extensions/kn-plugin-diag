@@ -39,26 +39,40 @@ const (
 	Allowed Flag = "Allowed"
 )
 
+// service annotations under features.knative.dev/*
+const (
+	// QueueProxyPodInfoFeatureKey gates mouting of podinfo with the value 'enabled'
+	QueueProxyPodInfoFeatureKey = "features.knative.dev/queueproxy-podinfo"
+
+	// DryRunFeatureKey gates the podspec dryrun feature and runs with the value 'enabled'
+	DryRunFeatureKey = "features.knative.dev/podspec-dryrun"
+)
+
 func defaultFeaturesConfig() *Features {
 	return &Features{
-		MultiContainer:               Enabled,
-		PodSpecAffinity:              Disabled,
-		PodSpecDryRun:                Allowed,
-		PodSpecHostAliases:           Disabled,
-		PodSpecFieldRef:              Disabled,
-		PodSpecNodeSelector:          Disabled,
-		PodSpecRuntimeClassName:      Disabled,
-		PodSpecSecurityContext:       Disabled,
-		PodSpecPriorityClassName:     Disabled,
-		PodSpecSchedulerName:         Disabled,
-		ContainerSpecAddCapabilities: Disabled,
-		PodSpecTolerations:           Disabled,
-		PodSpecVolumesEmptyDir:       Disabled,
-		PodSpecPersistentVolumeClaim: Disabled,
-		PodSpecPersistentVolumeWrite: Disabled,
-		PodSpecInitContainers:        Disabled,
-		TagHeaderBasedRouting:        Disabled,
-		AutoDetectHTTP2:              Disabled,
+		MultiContainer:                   Enabled,
+		PodSpecAffinity:                  Disabled,
+		PodSpecTopologySpreadConstraints: Disabled,
+		PodSpecDryRun:                    Allowed,
+		PodSpecHostAliases:               Disabled,
+		PodSpecFieldRef:                  Disabled,
+		PodSpecNodeSelector:              Disabled,
+		PodSpecRuntimeClassName:          Disabled,
+		PodSpecSecurityContext:           Disabled,
+		PodSpecPriorityClassName:         Disabled,
+		PodSpecSchedulerName:             Disabled,
+		ContainerSpecAddCapabilities:     Disabled,
+		PodSpecTolerations:               Disabled,
+		PodSpecVolumesEmptyDir:           Enabled,
+		PodSpecPersistentVolumeClaim:     Disabled,
+		PodSpecPersistentVolumeWrite:     Disabled,
+		QueueProxyMountPodInfo:           Disabled,
+		PodSpecInitContainers:            Disabled,
+		PodSpecDNSPolicy:                 Disabled,
+		PodSpecDNSConfig:                 Disabled,
+		SecurePodDefaults:                Disabled,
+		TagHeaderBasedRouting:            Disabled,
+		AutoDetectHTTP2:                  Disabled,
 	}
 }
 
@@ -69,6 +83,7 @@ func NewFeaturesConfigFromMap(data map[string]string) (*Features, error) {
 	if err := cm.Parse(data,
 		asFlag("multi-container", &nc.MultiContainer),
 		asFlag("kubernetes.podspec-affinity", &nc.PodSpecAffinity),
+		asFlag("kubernetes.podspec-topologyspreadconstraints", &nc.PodSpecTopologySpreadConstraints),
 		asFlag("kubernetes.podspec-dryrun", &nc.PodSpecDryRun),
 		asFlag("kubernetes.podspec-hostaliases", &nc.PodSpecHostAliases),
 		asFlag("kubernetes.podspec-fieldref", &nc.PodSpecFieldRef),
@@ -83,7 +98,11 @@ func NewFeaturesConfigFromMap(data map[string]string) (*Features, error) {
 		asFlag("kubernetes.podspec-init-containers", &nc.PodSpecInitContainers),
 		asFlag("kubernetes.podspec-persistent-volume-claim", &nc.PodSpecPersistentVolumeClaim),
 		asFlag("kubernetes.podspec-persistent-volume-write", &nc.PodSpecPersistentVolumeWrite),
+		asFlag("kubernetes.podspec-dnspolicy", &nc.PodSpecDNSPolicy),
+		asFlag("kubernetes.podspec-dnsconfig", &nc.PodSpecDNSConfig),
+		asFlag("secure-pod-defaults", &nc.SecurePodDefaults),
 		asFlag("tag-header-based-routing", &nc.TagHeaderBasedRouting),
+		asFlag("queueproxy.mount-podinfo", &nc.QueueProxyMountPodInfo),
 		asFlag("autodetect-http2", &nc.AutoDetectHTTP2)); err != nil {
 		return nil, err
 	}
@@ -97,24 +116,29 @@ func NewFeaturesConfigFromConfigMap(config *corev1.ConfigMap) (*Features, error)
 
 // Features specifies which features are allowed by the webhook.
 type Features struct {
-	MultiContainer               Flag
-	PodSpecAffinity              Flag
-	PodSpecDryRun                Flag
-	PodSpecFieldRef              Flag
-	PodSpecHostAliases           Flag
-	PodSpecNodeSelector          Flag
-	PodSpecRuntimeClassName      Flag
-	PodSpecSecurityContext       Flag
-	PodSpecPriorityClassName     Flag
-	PodSpecSchedulerName         Flag
-	ContainerSpecAddCapabilities Flag
-	PodSpecTolerations           Flag
-	PodSpecVolumesEmptyDir       Flag
-	PodSpecInitContainers        Flag
-	PodSpecPersistentVolumeClaim Flag
-	PodSpecPersistentVolumeWrite Flag
-	TagHeaderBasedRouting        Flag
-	AutoDetectHTTP2              Flag
+	MultiContainer                   Flag
+	PodSpecAffinity                  Flag
+	PodSpecTopologySpreadConstraints Flag
+	PodSpecDryRun                    Flag
+	PodSpecFieldRef                  Flag
+	PodSpecHostAliases               Flag
+	PodSpecNodeSelector              Flag
+	PodSpecRuntimeClassName          Flag
+	PodSpecSecurityContext           Flag
+	PodSpecPriorityClassName         Flag
+	PodSpecSchedulerName             Flag
+	ContainerSpecAddCapabilities     Flag
+	PodSpecTolerations               Flag
+	PodSpecVolumesEmptyDir           Flag
+	PodSpecInitContainers            Flag
+	PodSpecPersistentVolumeClaim     Flag
+	PodSpecPersistentVolumeWrite     Flag
+	QueueProxyMountPodInfo           Flag
+	PodSpecDNSPolicy                 Flag
+	PodSpecDNSConfig                 Flag
+	SecurePodDefaults                Flag
+	TagHeaderBasedRouting            Flag
+	AutoDetectHTTP2                  Flag
 }
 
 // asFlag parses the value at key as a Flag into the target, if it exists.
