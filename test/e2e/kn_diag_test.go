@@ -74,7 +74,7 @@ func TestKnDiagPlugin(t *testing.T) {
 
 	ksvcName := "kn-diag-e2etest"
 	//prerequieste for the kn-diag test
-	knResultOut := e2eTest.kn.Run("service", "create", ksvcName, "--image", "gcr.io/knative-samples/autoscale-go:0.1")
+	knResultOut := e2eTest.kn.Run("service", "create", ksvcName, "--image", "ghcr.io/knative/autoscale-go:latest")
 	r.AssertNoError(knResultOut)
 
 	e2eTest.testKnDiagDefault(t, r, ksvcName)
