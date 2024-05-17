@@ -1,4 +1,6 @@
 # kn-diag
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fknative-extensions%2Fkn-plugin-diag.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fknative-extensions%2Fkn-plugin-diag?ref=badge_shield)
+
 
 **[This component is ALPHA](https://github.com/knative/community/tree/main/mechanics/MATURITY-LEVELS.md)**
 
@@ -75,3 +77,7 @@ Note: you can short the exposed key info list by managing the [key info list](./
 ```
 go build -o kn-diag ./cmd/main.go
 ```
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fknative-extensions%2Fkn-plugin-diag.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fknative-extensions%2Fkn-plugin-diag?ref=badge_large)
