@@ -251,6 +251,7 @@ google.golang.org/appengine v1.1.0/go.mod h1:EbEs0AVv82hx2wNQdGPgUI5lhzA/G0D9Ywl
 google.golang.org/appengine v1.4.0/go.mod h1:xpcJRLb0r/rnEns0DIKYYv+WjYCduHsrkT7/EB5XEv4=
 google.golang.org/genproto v0.0.0-20180817151627-c66870c02cf8/go.mod h1:JiN7NxoALGmiZfu7CAH4rXhgtRTLTxftemlI0sWmxmc=
 google.golang.org/genproto v0.0.0-20190819201941-24fa4b261c55/go.mod h1:DMBHOl98Agz4BDEuKkezgsaosCRResVns1a3J2ZsMNc=
+google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013 h1:+kGHl1aib/qcwaRi1CbqBZ1rk19r85MNUf8HaBghugY=
 google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013/go.mod h1:NbSheEEYHJ7i3ixzK3sjbqSGDJWnxyFXZblF3eUsNvo=
 google.golang.org/genproto v0.0.0-20240528184218-531527333157 h1:u7WMYrIrVvs0TF5yaKwKNbcJyySYf+HAIFXxWltJOXE=
 google.golang.org/genproto/googleapis/api v0.0.0-20240604185151-ef581f913117 h1:+rdxYoE3E5htTEWIe15GlN6IfvbURM//Jt0mmkmm6ZU=
@@ -311,8 +312,12 @@ knative.dev/networking v0.0.0-20240611072033-3b8764c0bb4c h1:Q+DdJYzvhwAVWMQtP6m
 knative.dev/networking v0.0.0-20240611072033-3b8764c0bb4c/go.mod h1:WhZLv94eOMDGHbdZiMrw6cnRfN3WEcFgpjUcV0A48pI=
 knative.dev/pkg v0.0.0-20240620215714-915c00977757 h1:vjPAW4ll00Yu0H/avu1vkjbHHh9n0DlukvWGl2eHrs4=
 knative.dev/pkg v0.0.0-20240620215714-915c00977757/go.mod h1:uqK/Rec08I8njY3r2y8aY90Lmt/a8cUwm8H2XI9jHZk=
+knative.dev/pkg v0.0.0-20240626134149-3f6a546ac3a4 h1:slPKf3UKdBFZlz+hFy+KXzTgY9yOePLzRuEhKzgc5a4=
+knative.dev/pkg v0.0.0-20240626134149-3f6a546ac3a4/go.mod h1:Wikg4u73T6vk9TctrxZt60VXzqmGEQIx0iKfk1+9o4c=
 knative.dev/serving v0.41.1-0.20240621121347-a5ad85b2da9b h1:qcuzdyPRqejNOXO4FqReOIry2sLAkOS79gkJ9R2z4V8=
 knative.dev/serving v0.41.1-0.20240621121347-a5ad85b2da9b/go.mod h1:Bkda7I91lExSlGBC+4HU714kTYK+fmQhTcvTQNqtFqc=
+knative.dev/serving v0.41.1-0.20240701085953-75f7393aaed4 h1:dTxEVyu43JWV6lsGCwkjdCIoQvCZF3mkrM2IlIWuc/g=
+knative.dev/serving v0.41.1-0.20240701085953-75f7393aaed4/go.mod h1:7+wAf1rE/O2O+92Ft8Bfw3LnDirkg4c/+jKU3giMIoc=
 sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd h1:EDPBXCAspyGV4jQlpZSudPeMmr1bNJefnuqLsRAsHZo=
 sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd/go.mod h1:B8JuhiUyNFVKdsE8h686QcCxMaH6HrOAZj4vswFpcB0=
 sigs.k8s.io/structured-merge-diff/v4 v4.4.1 h1:150L+0vs/8DA78h1u02ooW1/fFq/Lwr+sGiqlzvrtq4=

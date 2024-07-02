@@ -2,8 +2,6 @@ module knative.dev/kn-plugin-diag
 
 go 1.22
 
-toolchain go1.22.4
-
 require (
 	github.com/fatih/color v1.13.0
 	github.com/spf13/cobra v1.7.0
@@ -13,7 +11,7 @@ require (
 	k8s.io/client-go v0.29.2
 	knative.dev/client-pkg v0.0.0-20240607132727-8fbea3d02b53
 	knative.dev/hack v0.0.0-20240607132042-09143140a254
-	knative.dev/serving v0.41.1-0.20240621121347-a5ad85b2da9b
+	knative.dev/serving v0.41.1-0.20240701085953-75f7393aaed4
 )
 
 require (
@@ -67,7 +65,7 @@ require (
 	k8s.io/kube-openapi v0.0.0-20231010175941-2dd684a91f00 // indirect
 	k8s.io/utils v0.0.0-20240102154912-e7106e64919e // indirect
 	knative.dev/networking v0.0.0-20240611072033-3b8764c0bb4c // indirect
-	knative.dev/pkg v0.0.0-20240620215714-915c00977757 // indirect
+	knative.dev/pkg v0.0.0-20240626134149-3f6a546ac3a4 // indirect
 	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.4.1 // indirect
 	sigs.k8s.io/yaml v1.4.0 // indirect
